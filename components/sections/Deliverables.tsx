@@ -14,7 +14,7 @@ export function Deliverables() {
       <div className="section section--paper deliverables-intro">
         <div className="container">
           <Reveal>
-            <Label>{deliverables.label}</Label>
+            <Label index={deliverables.index}>{deliverables.label}</Label>
             <h2 id="deliverables-title" className="h2 deliverables-heading">
               {deliverables.heading}
             </h2>

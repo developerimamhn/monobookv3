@@ -1,4 +1,5 @@
 /** Shared helpers for the check scripts: a static server for out/ and Playwright. */
+import { fileURLToPath } from "node:url";
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -20,7 +21,7 @@ export function loadPlaywright() {
 const types = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml", ".txt": "text/plain", ".xml": "application/xml", ".json": "application/json", ".ico": "image/x-icon" };
 
 /** Serve out/ on a free port. Returns { url, close }. */
-export async function serveOut(root = new URL("../out", import.meta.url).pathname) {
+export async function serveOut(root = fileURLToPath(new URL("../out", import.meta.url))) {
   const server = createServer(async (req, res) => {
     let path = decodeURIComponent((req.url ?? "/").split("?")[0]);
     let file = join(root, path);

@@ -1,24 +1,34 @@
 /* ==========================================================================
-   MonoBook design system. Tokens are fixed by docs/BRIEF.md.
-   Pine (#1F3D2E) may appear at most three times on the page.
-   Register: content/tokens.ts (PINE_USES). Check: npm run check:brief.
+   MonoBook design system, from the brand guideline in Figma
+   (MonoBook Presentations, Guideline). Colours: Orange, Black, White, Grey.
+   Type: Inter for headings, Manrope for text.
+   Orange is used only where content/tokens.ts (BRAND_USES) lists it.
+   Check: npm run check:brief.
    ========================================================================== */
 
 :root {
   /* Colour */
-  --ink: #101012;
-  --paper: #fafaf8;
-  --stone: #edede9;
-  --muted: #6b6b70;
-  --pine: #1f3d2e;
-  --line: rgba(16, 16, 18, 0.14);
-  --line-strong: rgba(16, 16, 18, 0.32);
-  /* Placeholder greys are Ink at low opacity, so no new colours enter. */
-  --placeholder: rgba(16, 16, 18, 0.1);
-  --placeholder-2: rgba(16, 16, 18, 0.22);
+  /* Guideline palette */
+  --brand: #ed3614; /* Primary Color */
+  --ink: #0b0b0b; /* Black */
+  --paper: #fbfbfb; /* White */
+  --grey: #ababab; /* Grey: lines and placeholders, never text */
+  /* Working tints, mixed from the palette */
+  --stone: #efefef; /* White with 5% Black, alternate sections */
+  --muted: #5e5e5e; /* Black at 66% on White, body and captions */
+  --line: rgba(11, 11, 11, 0.12);
+  --line-strong: rgba(11, 11, 11, 0.3);
+  /* Placeholder greys are Black at low opacity, so no new colours enter. */
+  --placeholder: rgba(11, 11, 11, 0.08);
+  --placeholder-2: rgba(11, 11, 11, 0.2);
+  /* On Ink chapters, secondary text and lines are Paper at opacity. */
+  --paper-muted: rgba(251, 251, 251, 0.7);
+  --paper-faint: rgba(251, 251, 251, 0.05);
+  --line-dark: rgba(251, 251, 251, 0.18);
 
   /* Type: one grotesque family, set in app/layout.tsx */
-  --font-sans: var(--font-grotesk), "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
 
   /* Fluid type scale. Body never drops below 18px. */
   --text-small: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem); /* 16-17px, captions */
@@ -27,6 +37,8 @@
   --text-h3: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
   --text-h2: clamp(2.25rem, 1.6rem + 3.2vw, 4.75rem);
   --text-display: clamp(3rem, 1.6rem + 6.4vw, 8.5rem);
+  --text-hero: clamp(3.25rem, 1rem + 7.6vw, 10rem);
+  --text-email: clamp(1.625rem, 0.5rem + 5.4vw, 7.5rem);
 
   /* Spacing, 4px base */
   --space-1: 0.25rem;
@@ -137,6 +149,16 @@ button {
 h1,
 h2,
 h3,
+h4,
+.display,
+.h2,
+.h3 {
+  font-family: var(--font-display);
+}
+
+h1,
+h2,
+h3,
 h4 {
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -169,19 +191,23 @@ p {
   .grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
-  .col-2 { grid-column: span 2; }
-  .col-3 { grid-column: span 3; }
-  .col-4 { grid-column: span 4; }
-  .col-5 { grid-column: span 5; }
-  .col-6 { grid-column: span 6; }
-  .col-7 { grid-column: span 7; }
-  .col-8 { grid-column: span 8; }
-  .col-10 { grid-column: span 10; }
-  .col-12 { grid-column: 1 / -1; }
-  .start-3 { grid-column-start: 3; }
-  .start-4 { grid-column-start: 4; }
-  .start-5 { grid-column-start: 5; }
-  .start-7 { grid-column-start: 7; }
+  /* Span and start are separate custom properties, so .col-N and .start-N combine. */
+  [class^="col-"],
+  [class*=" col-"] { grid-column: var(--start, auto) / span var(--span, 12); }
+  .col-2 { --span: 2; }
+  .col-3 { --span: 3; }
+  .col-4 { --span: 4; }
+  .col-5 { --span: 5; }
+  .col-6 { --span: 6; }
+  .col-7 { --span: 7; }
+  .col-8 { --span: 8; }
+  .col-10 { --span: 10; }
+  .col-12 { --span: 12; }
+  .start-3 { --start: 3; }
+  .start-4 { --start: 4; }
+  .start-5 { --start: 5; }
+  .start-7 { --start: 7; }
+  .start-9 { --start: 9; }
 }
 
 .section {
@@ -194,6 +220,40 @@ p {
 
 .section--stone {
   background: var(--stone);
+}
+
+.section--ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.section--ink .label,
+.section--ink .lead {
+  color: var(--paper-muted);
+}
+
+.section--ink .label-index {
+  color: var(--paper);
+}
+
+.section--ink :focus-visible {
+  outline-color: var(--paper);
+}
+
+/* Orange chapter, as on the guideline cover. White only at large sizes
+   (3.9:1 passes AA for large text); small text is Black (5.4:1). */
+.section--brand {
+  background: var(--brand);
+  color: var(--ink);
+}
+
+.section--brand .label,
+.section--brand .label-index {
+  color: var(--ink);
+}
+
+.section--brand :focus-visible {
+  outline-color: var(--ink);
 }
 
 /* --- Type helpers --------------------------------------------------------- */
@@ -285,39 +345,96 @@ p {
 /* --- Header --------------------------------------------------------------- */
 
 .site-header {
-  position: absolute;
+  position: fixed;
   inset: 0 0 auto 0;
   z-index: 10;
+  background: var(--paper);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s ease;
+}
+
+.site-header.is-scrolled {
+  border-bottom-color: var(--line);
 }
 
 .site-header-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-5);
   min-height: 4.5rem;
 }
 
-.wordmark,
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--brand);
+}
+
+.wordmark-svg {
+  width: auto;
+  height: 1.375rem;
+}
+
+.logo-tile-bg {
+  fill: var(--brand);
+}
+
+.logo-tile-mark {
+  fill: var(--paper);
+}
+
+.site-nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+/* Phones keep only Contact in the bar. The chapters are one scroll away. */
+.site-nav-chapter {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .site-nav-chapter {
+    display: list-item;
+  }
+}
+
 .header-link {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
   font-size: var(--text-small);
+  color: var(--muted);
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-.wordmark {
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.header-link {
+.header-link:hover {
   color: var(--ink);
 }
 
-.header-link:hover,
-.wordmark:hover {
-  text-decoration: underline;
+.header-link--contact {
+  color: var(--ink);
+  padding-inline: var(--space-5);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.header-link--contact {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.header-link--contact:hover {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .skip-link {
@@ -335,31 +452,165 @@ p {
   top: var(--space-3);
 }
 
+/* Fixed header: in-page targets land below it. */
+html {
+  scroll-padding-top: 4.5rem;
+}
+
 /* --- Hero ----------------------------------------------------------------- */
 
 .hero {
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
-  align-items: center;
   background: var(--paper);
 }
 
 .hero-inner {
-  padding-block: var(--space-10) var(--space-9);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding-block: calc(4.5rem + var(--space-8)) var(--space-6);
 }
 
 .hero-title {
-  max-width: 14ch;
+  font-size: var(--text-hero);
+  letter-spacing: -0.045em;
+  line-height: 0.95;
 }
 
 .hero-line {
   display: block;
 }
 
+.hero-line--2 {
+  color: var(--brand);
+}
+
+@media (min-width: 900px) {
+  .hero-line--2 {
+    margin-left: 16.666%;
+  }
+}
+
+.hero-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line-strong);
+}
+
 .hero-sub {
-  margin-top: var(--space-7);
   max-width: 36ch;
+  color: var(--ink);
+}
+
+.hero-scroll {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-small);
+  color: var(--muted);
+}
+
+.hero-scroll-line {
+  display: block;
+  width: 1px;
+  height: 3rem;
+  background: var(--line-strong);
+}
+
+@media (min-width: 900px) {
+  .hero-scroll {
+    display: inline-flex;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-scroll-line {
+    animation: scroll-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+}
+
+@keyframes scroll-cue {
+  0% { transform: scaleY(0); transform-origin: top; }
+  45% { transform: scaleY(1); transform-origin: top; }
+  55% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+/* --- Showcase: MonoBook's own identity ------------------------------------ */
+
+.showcase {
+  background: var(--paper);
+  padding-block: 0 var(--space-section);
+}
+
+.showcase-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.showcase-item img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: var(--ink);
+}
+
+.showcase-item figcaption {
+  margin-top: var(--space-3);
+  font-size: var(--text-small);
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .showcase-grid {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  .showcase-item--1 {
+    grid-row: 1 / span 2;
+  }
+  .showcase-item--1 img {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+  .showcase-item--1 {
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+}
+
+.showcase-text {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+}
+
+.showcase-label {
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+
+.showcase-caption {
+  max-width: 44ch;
+}
+
+@media (min-width: 900px) {
+  .showcase-text {
+    grid-template-columns: 1fr 2fr;
+    column-gap: var(--column-gap);
+  }
 }
 
 /* --- Problem -------------------------------------------------------------- */
@@ -401,9 +652,8 @@ p {
   stroke-width: 1.5;
 }
 
-/* Pine use 1 of 3 */
 .problem-mark--merged {
-  fill: var(--pine);
+  fill: var(--brand);
 }
 
 .problem-caption {
@@ -516,7 +766,7 @@ p {
   }
 }
 
-/* Progress line, 1/5 to 5/5. Pine use 2 of 3. Wide screens only, so it never covers text on phones. */
+/* Progress line, 1/5 to 5/5, in orange. Wide screens only, so it never covers text on phones. */
 .progress {
   display: none;
   position: fixed;
@@ -557,7 +807,7 @@ p {
 .progress-fill {
   position: absolute;
   inset: 0;
-  background: var(--pine);
+  background: var(--brand);
   transform-origin: left center;
   transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -834,8 +1084,12 @@ p {
 
 /* --- Pace ----------------------------------------------------------------- */
 
-.pace-intro {
-  margin-top: var(--space-5);
+.pace-head {
+  align-items: end;
+}
+
+.pace-head .label {
+  margin-bottom: var(--space-2);
 }
 
 .pace-options {
@@ -843,100 +1097,309 @@ p {
   padding: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-8) var(--column-gap);
+  gap: var(--space-4);
   margin-top: var(--space-9);
 }
 
 .pace-option {
-  border-top: 1px solid var(--line-strong);
-  padding-top: var(--space-5);
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  background: var(--paper);
+  border-radius: var(--radius);
+}
+
+/* The sprint is the one-day option, so it gets the dark card. */
+.pace-option--sprint {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.pace-option--sprint .body,
+.pace-option--sprint .pace-step,
+.pace-option--sprint .pace-length {
+  color: var(--paper-muted);
 }
 
 .pace-step {
-  display: block;
   font-size: var(--text-small);
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
-.pace-length {
+.pace-name {
   font-size: var(--text-h3);
-  margin-top: var(--space-6);
+  margin-top: var(--space-8);
 }
 
-.pace-title {
-  margin-top: var(--space-3);
-  font-weight: 500;
+.pace-length {
+  font-size: var(--text-small);
+  color: var(--muted);
 }
 
 .pace-option .body {
-  margin-top: var(--space-3);
-}
-
-.pace-identical {
-  margin-top: var(--space-9);
-  max-width: 22ch;
-}
-
-.pace-effort {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-6) var(--column-gap);
-  margin-top: var(--space-7);
-}
-
-.pace-effort dt {
-  font-weight: 500;
-}
-
-.pace-effort dd {
-  margin: var(--space-2) 0 0;
-  color: var(--muted);
-  max-width: 36ch;
+  margin-top: var(--space-4);
 }
 
 @media (min-width: 900px) {
   .pace-options {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .pace-effort {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .pace-option {
+    min-height: 24rem;
+    padding: var(--space-7);
   }
 }
 
-/* --- Proof ---------------------------------------------------------------- */
+/* Sprint day: four steps on one line */
+.sprint {
+  margin-top: var(--space-10);
+}
+
+.sprint-heading {
+  font-size: var(--text-lead);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.sprint-steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7) var(--column-gap);
+  margin-top: var(--space-7);
+}
+
+.sprint-step {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding-left: var(--space-6);
+  border-left: 1px solid var(--line-strong);
+}
+
+.sprint-dot {
+  position: absolute;
+  left: -5px;
+  top: 0.45em;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.sprint-num {
+  font-size: var(--text-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sprint-when {
+  font-weight: 500;
+}
+
+@media (min-width: 900px) {
+  .sprint-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .sprint-step {
+    padding: var(--space-6) var(--space-4) 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+  .sprint-dot {
+    left: 0;
+    top: -5px;
+  }
+}
+
+.pace-identical {
+  margin-top: var(--space-10);
+  max-width: 22ch;
+}
+
+/* --- What we need --------------------------------------------------------- */
+
+.needs .grid {
+  row-gap: var(--space-8);
+}
+
+.needs-note {
+  margin-top: var(--space-5);
+}
+
+.needs-button {
+  margin-top: var(--space-7);
+}
+
+.needs-list {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line-strong);
+}
+
+.needs-list li {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-lead);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.needs-num {
+  font-size: var(--text-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.35em;
+}
+
+@media (min-width: 900px) {
+  .needs-head {
+    position: sticky;
+    top: calc(4.5rem + var(--space-7));
+    align-self: start;
+  }
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.5rem;
+  padding: var(--space-4) var(--space-6);
+  border-radius: 999px;
+  font-size: var(--text-body);
+  font-weight: 500;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button-outline {
+  border: 1px solid var(--ink);
+  color: var(--ink);
+}
+
+.button-outline:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 767.98px) {
+  .button {
+    display: flex;
+    width: 100%;
+  }
+}
+
+/* --- Proof (dark chapter) ------------------------------------------------- */
 
 .proof-intro {
   max-width: 40ch;
 }
 
-.proof-card {
+.proof-case {
+  margin-top: var(--space-10);
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--line-dark);
+}
+
+.proof-company {
+  font-size: var(--text-display);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  max-width: 12ch;
+}
+
+.proof-body {
   margin-top: var(--space-9);
-  padding: var(--space-6);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
+  row-gap: var(--space-8);
+}
+
+.proof-facts {
   display: grid;
-  gap: var(--space-5);
-  max-width: 56rem;
+  align-content: start;
+  border-top: 1px solid var(--line-dark);
 }
 
-.proof-meta {
-  color: var(--muted);
+.proof-facts div {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--line-dark);
 }
 
-.proof-did {
-  border-top: 1px solid var(--line);
-  padding-top: var(--space-5);
+.proof-facts dt {
+  color: var(--paper-muted);
+  font-size: var(--text-small);
+  padding-top: 0.15em;
+}
+
+.proof-facts dd {
+  margin: 0;
 }
 
 .proof-did-label {
-  font-weight: 500;
-  margin-bottom: var(--space-2);
+  color: var(--paper-muted);
+  font-size: var(--text-small);
+  margin-bottom: var(--space-4);
+}
+
+.proof-did-text {
+  font-size: var(--text-lead);
+  line-height: 1.4;
+  max-width: 34ch;
+}
+
+.proof-images {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-9);
+}
+
+.proof-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius);
+  background: var(--paper-faint);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.proof-frame-label {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-5);
+  font-size: var(--text-small);
+}
+
+.proof-frame-placeholder {
+  font-size: var(--text-small);
+  color: var(--paper-muted);
+}
+
+@media (min-width: 900px) {
+  .proof-images {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .proof-quote {
   margin-top: var(--space-10);
-  max-width: 62rem;
+  max-width: 64rem;
 }
 
 .proof-quote blockquote {
@@ -944,36 +1407,16 @@ p {
 }
 
 .proof-quote blockquote p {
-  font-size: var(--text-h3);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
+  font-size: var(--text-h2);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
   font-weight: 500;
   text-indent: -0.4em;
 }
 
 .proof-quote figcaption {
-  margin-top: var(--space-6);
-  color: var(--muted);
-}
-
-@media (min-width: 900px) {
-  .proof-card {
-    padding: var(--space-8);
-    grid-template-columns: 1fr 1fr;
-    column-gap: var(--space-8);
-  }
-  .proof-company {
-    grid-column: 1;
-  }
-  .proof-meta {
-    grid-column: 1;
-  }
-  .proof-did {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    border-top: 0;
-    padding-top: 0;
-  }
+  margin-top: var(--space-7);
+  color: var(--paper-muted);
 }
 
 /* --- Contact -------------------------------------------------------------- */
@@ -987,83 +1430,146 @@ p {
 }
 
 .contact-action {
-  margin-top: var(--space-8);
+  margin-top: var(--space-9);
 }
 
-.button {
+.contact-email {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  min-height: 3.5rem;
-  padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius);
-  font-size: var(--text-body);
-  font-weight: 500;
+  gap: var(--space-4) var(--space-6);
+  min-height: var(--tap);
+  max-width: 100%;
+  color: var(--ink);
   text-decoration: none;
-  overflow-wrap: anywhere;
-  text-align: center;
 }
 
-/* Pine use 3 of 3 */
-.button-primary {
-  background: var(--pine);
+.contact-heading {
   color: var(--paper);
 }
 
-.button-primary:hover {
+.contact-email-text {
+  font-family: var(--font-display);
+  font-size: var(--text-email);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--paper);
+  overflow-wrap: anywhere;
   text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: rgba(251, 251, 251, 0.45);
+  text-underline-offset: 0.14em;
+  transition: text-decoration-color 0.3s ease;
 }
 
-.button-primary:focus-visible {
-  outline-color: var(--ink);
+.contact-email:hover .contact-email-text {
+  text-decoration-color: var(--paper);
+}
+
+/* The round arrow beside the email: Black on the orange chapter. */
+.contact-arrow {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: clamp(3.5rem, 2.5rem + 3vw, 6rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.contact-arrow svg {
+  width: 42%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.contact-email:hover .contact-arrow {
+  transform: rotate(45deg);
 }
 
 .contact-note {
-  margin-top: var(--space-5);
-  font-size: var(--text-body);
-  color: var(--muted);
-}
-
-@media (max-width: 767.98px) {
-  .button {
-    display: flex;
-    width: 100%;
-  }
+  margin-top: var(--space-7);
+  color: var(--ink);
 }
 
 /* --- Footer --------------------------------------------------------------- */
 
 .site-footer {
-  background: var(--paper);
-  padding-block: var(--space-8);
+  background: var(--ink);
+  color: var(--paper);
+  padding-block: var(--space-9) var(--space-6);
   font-size: var(--text-small);
-  color: var(--muted);
 }
 
-.site-footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: var(--space-6);
+.site-footer-cols {
+  row-gap: var(--space-7);
 }
 
-.footer-address {
+.footer-col {
   display: grid;
+  align-content: start;
   gap: var(--space-1);
   font-style: normal;
   line-height: 1.5;
 }
 
-.footer-name {
-  color: var(--ink);
+.footer-col ul {
+  list-style: none;
+  padding: 0;
 }
 
-.footer-top {
+.footer-label {
+  color: var(--paper-muted);
+  margin-bottom: var(--space-3);
+}
+
+.footer-link {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
-  color: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+.site-footer :focus-visible {
+  outline-color: var(--paper);
+}
+
+@media (min-width: 900px) {
+  .footer-col--top {
+    justify-items: end;
+  }
+}
+
+.footer-brand {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-top: var(--space-10);
+}
+
+.footer-wordmark {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  max-width: 64rem;
+  height: auto;
+  color: var(--paper);
+}
+
+.footer-tile {
+  flex: none;
+  width: clamp(3rem, 2rem + 4vw, 7rem);
+  height: auto;
 }
 
 /* Sections that receive focus from in-page links do not need a ring. */

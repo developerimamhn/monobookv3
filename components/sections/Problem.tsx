@@ -49,7 +49,7 @@ export function Problem() {
   return (
     <section ref={ref} id="problem" className="section section--stone problem" aria-labelledby="problem-title">
       <div className="container">
-        <Label>{problem.label}</Label>
+        <Label index={problem.index}>{problem.label}</Label>
         <h2 id="problem-title" className="h2 problem-statement" aria-label={problem.statement}>
           {words.map((word, i) => (
             <span key={`${word}-${i}`} aria-hidden="true">

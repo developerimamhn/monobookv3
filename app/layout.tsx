@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Hanken_Grotesk } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import type { ReactNode } from "react";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { StructuredData } from "@/components/ui/StructuredData";
@@ -7,17 +7,24 @@ import { meta, site } from "@/content/copy";
 import "./globals.css";
 
 /*
- * Hanken Grotesk: an open source (SIL OFL) grotesque sans, so it is free to
- * license and self-host. It is neutral and calm at display sizes, stays clear
- * at 18px body size, and ships as one variable file. next/font self-hosts it
- * at build time, so there is no request to Google from the visitor's browser
- * and no layout shift (size-adjusted fallback).
+ * The two typefaces from the MonoBook brand guideline (Figma, pages 14 and 15):
+ * Inter for headings and brand areas, Manrope for paragraphs and short text.
+ * Both are open source (SIL OFL) variable fonts. next/font self-hosts them at
+ * build time, so there is no request to Google from the visitor's browser and
+ * no layout shift (size-adjusted fallbacks).
  */
-const grotesk = Hanken_Grotesk({
+const inter = Inter({
   subsets: ["latin"],
   weight: "variable",
   display: "swap",
-  variable: "--font-grotesk",
+  variable: "--font-inter",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: "variable",
+  display: "swap",
+  variable: "--font-manrope",
 });
 
 export const metadata: Metadata = {
@@ -45,7 +52,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FAFAF8",
+  themeColor: "#FBFBFB",
   colorScheme: "light",
   width: "device-width",
   initialScale: 1,
@@ -53,7 +60,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en-GB" className={grotesk.variable}>
+    <html lang="en-GB" className={`${inter.variable} ${manrope.variable}`}>
       <body>
         <StructuredData />
         <MotionProvider>{children}</MotionProvider>

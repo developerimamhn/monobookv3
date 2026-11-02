@@ -7,6 +7,8 @@ export function StructuredData() {
     "@type": "ProfessionalService",
     name: site.name,
     url: site.url,
+    email: site.email,
+    founder: { "@type": "Person", name: site.owner },
     description: meta.description,
     areaServed: "GB",
     address: {

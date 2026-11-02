@@ -7,15 +7,15 @@
  * - No banned words (see scripts/brief-check.mjs).
  * - Hyphens only, never em or en dashes.
  * - Plain, peer-to-peer English. Short sentences.
+ * - Only one client and one review: Mayfair Lumber and Eric Dahl.
  */
 
 export const site = {
   name: "MonoBook Brand Architects",
   shortName: "MonoBook",
-  /** [SITE URL] - replace with the live domain before launch. */
-  url: "https://monobook.example",
-  /** [CONTACT EMAIL] - replace with the studio inbox. */
-  email: "[CONTACT EMAIL]",
+  url: "https://monobook.co",
+  email: "mehedi@monobook.co",
+  owner: "Mehedi Hasan",
   locale: "en_GB",
 } as const;
 
@@ -27,8 +27,13 @@ export const meta = {
 } as const;
 
 export const header = {
-  wordmark: "MonoBook",
   wordmarkLabel: "MonoBook Brand Architects, back to top",
+  navLabel: "Sections",
+  nav: [
+    { href: "#deliverables", label: "What you get" },
+    { href: "#pace", label: "Process" },
+    { href: "#proof", label: "Proof" },
+  ],
   contact: "Contact",
   skipLink: "Skip to content",
 } as const;
@@ -37,9 +42,34 @@ export const hero = {
   /** Main line from the brief. Split into two lines for the load reveal. */
   lines: ["Your business works.", "It just does not look like it does."],
   sub: "We make your vans, signs, quotes and website look like one company. For established trade and service firms in the UK.",
+  scroll: "Scroll",
+} as const;
+
+/** The studio's own identity, applied. MonoBook's own brand, not a client. */
+export const showcase = {
+  label: "Our own identity",
+  caption: "We built MonoBook from the same five parts we deliver. One mark, one palette, one type system, on every card, sheet and tube.",
+  images: [
+    {
+      name: "business-card",
+      alt: "MonoBook business cards. The orange front carries the Mk. mark, the white back carries the name and contact details.",
+      caption: "Business cards",
+    },
+    {
+      name: "stationery",
+      alt: "MonoBook stationery: letterhead, envelope, compliment slip and business cards in orange, black and white.",
+      caption: "Stationery",
+    },
+    {
+      name: "poster-tube",
+      alt: "A black MonoBook poster tube with an orange band and the MonoBook. wordmark.",
+      caption: "Poster tube",
+    },
+  ],
 } as const;
 
 export const problem = {
+  index: "01",
   label: "The problem",
   statement:
     "A customer who sees one logo on your van and another on your quote is looking at two different companies.",
@@ -59,6 +89,7 @@ export type Deliverable = {
 };
 
 export const deliverables = {
+  index: "02",
   label: "What you get",
   heading: "Five things. Always these five, in this order.",
   progressLabel: "Deliverable",
@@ -138,45 +169,90 @@ export const demos = {
 } as const;
 
 export const pace = {
-  label: "Pace",
-  heading: "Same work. Three speeds.",
-  intro: "Pick the pace that suits your diary.",
+  index: "03",
+  label: "Process",
+  heading: "Same five parts. You choose the pace.",
+  intro: "Logo, Colour, Typeface, Image style and Guidelines, every time. The work is identical.",
   options: [
     {
-      length: "1 working day",
-      title: "The whole studio on your project",
-      body: "We talk in the morning. You see the finished identity by the end of the day.",
+      name: "Sprint",
+      length: "One working day",
+      body: "The whole studio works on your project that day. You receive all five parts by the end of it.",
     },
     {
-      length: "7 days",
-      title: "Two review points",
-      body: "You see the direction early and again before it is finished. Your comments go into each round.",
+      name: "Standard",
+      length: "Seven days",
+      body: "Two review points, scheduled at times that suit you.",
     },
     {
-      length: "14 days",
-      title: "A slower cadence",
-      body: "More time between steps, for owners who want to think it over or bring in a partner.",
+      name: "Extended",
+      length: "Fourteen days",
+      body: "The same work as seven days, at a slower cadence.",
     },
   ],
-  identical: "The work is identical. Only the pace changes.",
-  effort: {
-    yoursLabel: "Your part",
-    yours: "Tell us about the business. Say what works and what does not at each review.",
-    oursLabel: "Our part",
-    ours: "Everything else, from the first sketch to the finished guidelines.",
+  sprint: {
+    heading: "How the sprint day runs",
+    steps: [
+      {
+        when: "Before the day",
+        body: "You send your current logo, a few photos of your van, signs and workwear, and answers to a short brief.",
+      },
+      {
+        when: "In the morning",
+        body: "We confirm the brief by a short call or email.",
+      },
+      {
+        when: "During the day",
+        body: "The whole studio works on your project.",
+      },
+      {
+        when: "By the end of the day",
+        body: "You receive all five parts: logo files, colour palette with exact codes, typeface, image style and the guideline document.",
+      },
+    ],
   },
+  identical: "The work is identical. Only the pace changes.",
+} as const;
+
+export const needs = {
+  index: "04",
+  label: "What we need from you",
+  heading: "Send these and we can start.",
+  items: [
+    "Your current logo file.",
+    "A line about your business and how long it has been running.",
+    "Who your customers are.",
+    "Two competitors, with their websites.",
+    "What must stay, and what you want to change.",
+    "Where the new identity goes first: van, site board, workwear, quote sheet or website.",
+    "Photos of your van, signs and workwear.",
+  ],
+  note: "One email with all of it is enough.",
+  button: "Send your brief",
+  subject: "Brief for MonoBook",
 } as const;
 
 export const proof = {
+  index: "05",
   label: "Proof",
   intro:
     "In every one of these the company was already good at what it does. What changed was whether that was visible in the seconds a customer gives it. We do not take credit for their revenue. They built that.",
   card: {
     company: "Mayfair Lumber Sales Ltd",
-    what: "Wholesale lumber and remanufacturing, Alberta.",
-    since: "Canadian owned since 1976.",
+    facts: [
+      { term: "Business", value: "Wholesale lumber and remanufacturing" },
+      { term: "Where", value: "Alberta, Canada" },
+      { term: "History", value: "Canadian owned since 1976" },
+      { term: "Scope", value: "Mark, colour, type and an applied identity system across print, signage and digital" },
+      { term: "Led by", value: "Mehedi Hasan, owner of MonoBook" },
+    ],
     didLabel: "What we did",
     did: "A full visual rebrand of a company that had been trading for four decades: mark, colour, type and an applied identity system across print, signage and digital.",
+  },
+  images: {
+    before: { label: "Before", placeholder: "[MAYFAIR BEFORE IMAGE]" },
+    after: { label: "After", placeholder: "[MAYFAIR AFTER IMAGE]" },
+    figureLabel: "Mayfair Lumber identity before and after the rebrand. Images to follow.",
   },
   /** Word for word from the client. Do not edit. */
   quote:
@@ -185,11 +261,11 @@ export const proof = {
 } as const;
 
 export const contact = {
+  index: "06",
   label: "Contact",
   heading: "Tell us what your business does and where your name shows up.",
-  /** Button text. The address itself comes from site.email. */
-  button: "Email",
-  note: "One email is enough to start. We reply within [REPLY TIME].",
+  emailLabel: "Email",
+  note: "Email only. We reply within two hours, during UK working hours.",
 } as const;
 
 export const footer = {
@@ -203,5 +279,8 @@ export const footer = {
     region: "Khulna Division",
     country: "BD",
   },
+  studioLabel: "Studio",
+  contactLabel: "Contact",
+  pagesLabel: "On this page",
   backToTop: "Back to top",
 } as const;

@@ -4,10 +4,11 @@
  * hard rules in docs/BRIEF.md. Exit code 1 on any failure.
  * Run after `npm run build`.
  */
+import { fileURLToPath } from "node:url";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join, extname } from "node:path";
 
-const root = new URL("..", import.meta.url).pathname;
+const root = fileURLToPath(new URL("..", import.meta.url));
 const out = join(root, "out");
 const results = [];
 const pass = (rule, detail = "") => results.push({ rule, ok: true, detail });
@@ -77,10 +78,12 @@ const sourceCss = readFileSync(join(root, "app", "globals.css"), "utf8");
   const quoteOk = visible.includes(quote);
   const citeOk = visible.includes("Eric Dahl, Client, December 2023");
   const blockquotes = (html.match(/<blockquote/g) ?? []).length;
-  const imgs = (html.match(/<img\b/g) ?? []).length;
-  quoteOk && citeOk && blockquotes === 1 && imgs === 0
-    ? pass("Only the brief's proof (quote word for word, no logos)", "1 blockquote, 0 images")
-    : fail("Only the brief's proof (quote word for word, no logos)", `quote:${quoteOk} cite:${citeOk} blockquotes:${blockquotes} imgs:${imgs}`);
+  // Images may only be MonoBook's own brand mockups from public/brand/. No client logos.
+  const srcs = [...html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)].map((m) => m[1]);
+  const foreign = srcs.filter((src) => !src.startsWith("/brand/"));
+  quoteOk && citeOk && blockquotes === 1 && foreign.length === 0
+    ? pass("Only the brief's proof (quote word for word, no client images)", `1 blockquote, ${srcs.length} own-brand images`)
+    : fail("Only the brief's proof (quote word for word, no client images)", `quote:${quoteOk} cite:${citeOk} blockquotes:${blockquotes} foreign:${foreign.join(" ")}`);
 }
 
 // 5. Banned words
@@ -106,19 +109,23 @@ const sourceCss = readFileSync(join(root, "app", "globals.css"), "utf8");
   where.length || words.length ? fail("No ALL CAPS", [...where, ...words].join(", ")) : pass("No ALL CAPS", "UK and [PLACEHOLDERS] allowed");
 }
 
-// 8. Colour tokens exact
+// 8. Colour tokens exact (brand guideline palette plus two tints)
 {
-  const want = { "--ink": "#101012", "--paper": "#fafaf8", "--stone": "#edede9", "--muted": "#6b6b70", "--pine": "#1f3d2e" };
+  const want = { "--brand": "#ed3614", "--ink": "#0b0b0b", "--paper": "#fbfbfb", "--grey": "#ababab", "--stone": "#efefef", "--muted": "#5e5e5e" };
   const bad = Object.entries(want).filter(([k, v]) => !new RegExp(`${k}:\\s*${v}`, "i").test(sourceCss));
   bad.length ? fail("Colour tokens exact", bad.map(([k]) => k).join(", ")) : pass("Colour tokens exact");
 }
 
-// 9. Pine used at most three times
+// 9. Orange only where the register in content/tokens.ts allows it
 {
-  const uses = (sourceCss.match(/var\(--pine\)/g) ?? []).length;
-  const inline = (src.replace(sourceCss, "").match(/#1f3d2e/gi) ?? []).length - 1; // tokens.ts defines it once
-  const total = uses + Math.max(0, inline);
-  total <= 3 ? pass("Pine used at most three times", `${total} uses`) : fail("Pine used at most three times", `${total} uses`);
+  const tokens = readFileSync(join(root, "content", "tokens.ts"), "utf8");
+  const allowed = (tokens.match(/BRAND_USES = \[([\s\S]*?)\] as const/)?.[1].match(/^\s*"/gm) ?? []).length;
+  const uses = (sourceCss.match(/var\(--brand\)/g) ?? []).length;
+  // The hex may appear in tokens.ts (definition) and globals.css (token) only.
+  const stray = srcFiles.filter((f) => !/tokens\.ts$|globals\.css$|Logo\.tsx$/.test(f) && /#ed3614/i.test(readFileSync(f, "utf8")));
+  uses <= allowed && !stray.length
+    ? pass("Orange only where registered", `${uses} of ${allowed} registered uses`)
+    : fail("Orange only where registered", `${uses} uses, ${allowed} registered, stray: ${stray.join(" ")}`);
 }
 
 // 10. No blue anywhere
@@ -138,12 +145,13 @@ const sourceCss = readFileSync(join(root, "app", "globals.css"), "utf8");
   blue.length || named ? fail("No blue anywhere", blue.join(", ") || "named colour") : pass("No blue anywhere");
 }
 
-// 11. One sans family, no serif or script
+// 11. The guideline's two sans families (Inter, Manrope), no serif or script
 {
   const families = [...builtCss.matchAll(/font-family\s*:\s*([^;}]+)/gi)].map((m) => m[1]);
   const bad = families.filter((f) => /(?:^|,)\s*(?:serif|cursive|fantasy|"?(?:georgia|times)[^,]*)\s*(?:,|$)/i.test(f) && !/sans-serif/i.test(f.replace(/sans-serif/gi, "")));
   const named = [...new Set(families.flatMap((f) => f.split(",").map((n) => n.trim().replace(/["']/g, ""))))].filter((n) => n && !/^var\(|Fallback|Helvetica|Arial|^sans-serif$|^inherit$/i.test(n));
-  bad.length || named.length > 1 ? fail("One grotesque sans family", `${named.join(", ")} ${bad.join(", ")}`) : pass("One grotesque sans family", named.join(", "));
+  const extra = named.filter((n) => !/^(Inter|Manrope)$/i.test(n));
+  bad.length || extra.length ? fail("Inter and Manrope only", `${named.join(", ")} ${bad.join(", ")}`) : pass("Inter and Manrope only", named.join(", "));
 }
 
 // 12. No gradients, shadows, emoji, carousels, images
@@ -163,7 +171,7 @@ const sourceCss = readFileSync(join(root, "app", "globals.css"), "utf8");
 
 // 14. Page order
 {
-  const ids = ["hero", "problem", "deliverables", "pace", "proof", "contact"];
+  const ids = ["hero", "problem", "deliverables", "pace", "needs", "proof", "contact"];
   const pos = ids.map((id) => html.indexOf(`id="${id}"`));
   const footer = html.indexOf("<footer");
   const ordered = pos.every((p, i) => p > -1 && (i === 0 || p > pos[i - 1])) && footer > pos[pos.length - 1];
