@@ -30,6 +30,8 @@ export const header = {
     { href: "#proof", label: "Proof" },
   ] satisfies NavItem[],
   contact: "Contact",
+  menuOpen: "Menu",
+  menuClose: "Close",
   skipLink: "Skip to content",
 } as const;
 

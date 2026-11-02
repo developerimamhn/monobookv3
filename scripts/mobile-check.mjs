@@ -137,6 +137,64 @@ for (const id of ["pace", "needs", "proof", "contact"]) {
   await page.close();
 }
 
+// The block under the header must survive a resize across the pin breakpoint and a reload.
+{
+  const blockUnderHeader = (page) =>
+    page.evaluate(() => {
+      const line = document.querySelector(".site-header").offsetHeight + 2;
+      let hit = null;
+      for (const el of document.querySelectorAll("main > section, .deliverable")) {
+        const box = el.parentElement?.classList.contains("pin-spacer") ? el.parentElement : el;
+        if (box.getBoundingClientRect().top <= line) hit = el.id || el.getAttribute("aria-labelledby");
+      }
+      return hit;
+    });
+  const page = await open({ width: 1440, height: 900 });
+  await pause(2500);
+  await page.mouse.move(700, 450);
+  for (let d = 0; d < 6800; d += 400) {
+    await page.mouse.wheel({ deltaY: 400 });
+    await pause(40);
+  }
+  await pause(1500);
+  const start = await blockUnderHeader(page);
+  await page.setViewport({ width: 800, height: 900 });
+  await pause(2500);
+  const narrow = await blockUnderHeader(page);
+  await page.setViewport({ width: 1440, height: 900 });
+  await pause(2500);
+  const wide = await blockUnderHeader(page);
+  report(start && narrow === start && wide === start, "Resize across the pin breakpoint keeps your place", `${start} > ${narrow} > ${wide}`);
+  await page.reload({ waitUntil: "networkidle0" });
+  await pause(3000);
+  const reloaded = await blockUnderHeader(page);
+  report(reloaded === start, "Reload keeps your place", `${start} > ${reloaded}`);
+  await page.close();
+}
+
+// Phone menu: opens, lists every chapter, closes on Escape and after a jump.
+{
+  const page = await open({ width: 390, height: 844, isMobile: true, hasTouch: true });
+  const shown = () => page.evaluate(() => getComputedStyle(document.querySelector(".site-nav-list")).display !== "none");
+  const closedAtStart = !(await shown());
+  await page.click(".menu-toggle");
+  const links = await page.evaluate(() => [...document.querySelectorAll(".site-nav-list a")].filter((a) => a.getClientRects().length).length);
+  const expanded = await page.$eval(".menu-toggle", (b) => b.getAttribute("aria-expanded"));
+  await page.keyboard.press("Escape");
+  const closedByEscape = !(await shown());
+  await page.click(".menu-toggle");
+  await page.click('.site-nav-list a[href="#proof"]');
+  await pause(2500);
+  const closedAfterJump = !(await shown());
+  const gap = await page.evaluate(() => Math.round(document.getElementById("proof").getBoundingClientRect().top - document.querySelector(".site-header").getBoundingClientRect().bottom));
+  report(
+    closedAtStart && expanded === "true" && links === 5 && closedByEscape && closedAfterJump && Math.abs(gap) <= 4,
+    "Phone menu opens, closes and jumps",
+    `links ${links}, expanded ${expanded}, escape ${closedByEscape}, after jump ${closedAfterJump}, landed ${gap}px off`,
+  );
+  await page.close();
+}
+
 await browser.close();
 server.close();
 console.log(failures ? `\n${failures} check(s) failed` : "\nAll layout, accessibility and scroll checks pass");

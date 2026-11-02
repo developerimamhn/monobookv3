@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import { motion } from "./loadMotion";
 import { useScrollMotion } from "./useScrollMotion";
 
@@ -21,6 +21,10 @@ type RevealProps = {
  */
 export function Reveal({ children, as: Tag = "div", className, delay = 0, stagger = false }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
+  // A callback ref takes any of the four tags; an object ref would need one element type.
+  const setRef = useCallback((node: HTMLElement | null) => {
+    ref.current = node;
+  }, []);
 
   useScrollMotion(ref, ({ gsap, ScrollTrigger }, el) => {
     // Never hide what the visitor can see, or has already scrolled past.
@@ -37,8 +41,7 @@ export function Reveal({ children, as: Tag = "div", className, delay = 0, stagge
   });
 
   return (
-    // The union of tags shares one ref type in practice; React types each tag's ref separately.
-    <Tag ref={ref as never} className={className} data-reveal="">
+    <Tag ref={setRef} className={className} data-reveal="">
       {children}
     </Tag>
   );

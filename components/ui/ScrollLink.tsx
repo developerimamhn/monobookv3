@@ -10,16 +10,19 @@ type ScrollLinkProps = {
   className?: string;
   "aria-label"?: string;
   "aria-current"?: "true";
+  /** Called on click, before the scroll starts. The header uses it to close its menu. */
+  onNavigate?: () => void;
 };
 
 /**
  * In-page link. Scrolls the target to just under the header, then moves
  * keyboard focus there. Each jump is a history entry, so Back returns to it.
  */
-export function ScrollLink({ href, children, className, ...rest }: ScrollLinkProps) {
+export function ScrollLink({ href, children, className, onNavigate, ...rest }: ScrollLinkProps) {
   const { scrollTo } = useMotion();
 
   const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    onNavigate?.();
     const id = href.slice(1);
     const target = id === "top" ? null : document.getElementById(id);
     if (id !== "top" && !target) return;
