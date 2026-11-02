@@ -3,50 +3,53 @@
 import { useEffect, useState } from "react";
 import { deliverables } from "@/content/copy";
 
+export const LIST_ID = "deliverables-list";
 const total = deliverables.items.length;
 
 /**
- * One thin progress line, 1/5 to 5/5, shown while the deliverables are on
- * screen. Uses IntersectionObserver, not GSAP, so it also works under
- * reduced motion (it just stops animating its width).
+ * A thin line that fills as you scroll through the five deliverables, with a
+ * 1/5 count beside it. Plain scroll maths rather than GSAP, so it also works
+ * with reduced motion.
  */
 export function DeliverablesProgress() {
-  const [current, setCurrent] = useState(1);
+  const [progress, setProgress] = useState(0);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const list = document.getElementById("deliverables-list");
+    const list = document.getElementById(LIST_ID);
     if (!list) return;
-    const items = Array.from(list.querySelectorAll<HTMLElement>("[data-deliverable]"));
+    let frame = 0;
 
-    const inView = new IntersectionObserver(([entry]) => setVisible(Boolean(entry?.isIntersecting)), {
-      rootMargin: "-40% 0px -40% 0px",
-    });
-    inView.observe(list);
+    const update = () => {
+      frame = 0;
+      const r = list.getBoundingClientRect();
+      const vh = window.innerHeight;
+      setVisible(r.top < vh * 0.4 && r.bottom > vh * 0.6);
+      setProgress(Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - vh))));
+    };
+    const onScroll = () => {
+      frame ||= requestAnimationFrame(update);
+    };
 
-    const active = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setCurrent(items.indexOf(entry.target as HTMLElement) + 1);
-        }
-      },
-      { rootMargin: "-50% 0px -50% 0px" },
-    );
-    items.forEach((item) => active.observe(item));
-
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
-      inView.disconnect();
-      active.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
     };
   }, []);
 
+  const current = Math.min(total, Math.floor(progress * total) + 1);
+
   return (
     <div className={`progress${visible ? " is-visible" : ""}`} aria-hidden="true">
-      <span className="progress-count">
+      <span>
         {current}/{total}
       </span>
       <span className="progress-track">
-        <span className="progress-fill" style={{ transform: `scaleX(${current / total})` }} />
+        <span className="progress-fill" style={{ transform: `scaleX(${progress})` }} />
       </span>
     </div>
   );

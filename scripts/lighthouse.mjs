@@ -1,26 +1,25 @@
 #!/usr/bin/env node
-/**
- * Performance Team + SEO Team: Lighthouse (mobile, default throttling) on out/.
- * Runs 3 times and reports the median performance score. Fails below 90.
- */
+/** Lighthouse, mobile with default throttling, on out/. Three runs; fails if the median performance is below 90. */
 import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import lighthouse from "lighthouse";
 import * as chromeLauncher from "chrome-launcher";
-import { chromePath, serveOut } from "./_browser.mjs";
+import { chromePath, root, serveOut } from "./_browser.mjs";
 
 const runs = Number(process.env.LH_RUNS ?? 3);
+const reports = join(root, "reports");
 const server = await serveOut();
 const chrome = await chromeLauncher.launch({ chromePath, chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"] });
 const results = [];
 for (let i = 0; i < runs; i++) {
   const { lhr, report } = await lighthouse(server.url, { port: chrome.port, output: "html", logLevel: "error" });
   const score = (k) => Math.round((lhr.categories[k]?.score ?? 0) * 100);
-  const a = (k) => lhr.audits[k]?.displayValue ?? "";
-  results.push({ perf: score("performance"), a11y: score("accessibility"), bp: score("best-practices"), seo: score("seo"), lcp: a("largest-contentful-paint"), cls: a("cumulative-layout-shift"), tbt: a("total-blocking-time"), fcp: a("first-contentful-paint"), si: a("speed-index") });
+  const audit = (k) => lhr.audits[k]?.displayValue ?? "";
+  results.push({ perf: score("performance"), a11y: score("accessibility"), bp: score("best-practices"), seo: score("seo"), lcp: audit("largest-contentful-paint"), cls: audit("cumulative-layout-shift"), tbt: audit("total-blocking-time"), fcp: audit("first-contentful-paint"), si: audit("speed-index") });
   if (i === runs - 1) {
-    mkdirSync("reports", { recursive: true });
-    writeFileSync("reports/lighthouse-mobile.html", report);
-    writeFileSync("reports/lighthouse-mobile.json", JSON.stringify(lhr));
+    mkdirSync(reports, { recursive: true });
+    writeFileSync(join(reports, "lighthouse-mobile.html"), report);
+    writeFileSync(join(reports, "lighthouse-mobile.json"), JSON.stringify(lhr));
   }
 }
 await chrome.kill();

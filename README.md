@@ -1,107 +1,65 @@
 # MonoBook Brand Architects - website
 
-A one-page marketing site for MonoBook Brand Architects, a brand identity studio for established UK trade and service businesses.
+One-page site for MonoBook Brand Architects, a brand identity studio for established UK trade and service businesses.
 
-- **Brief (single source of truth):** [`docs/BRIEF.md`](docs/BRIEF.md). If anything conflicts with it, the brief wins.
-- **All copy:** [`content/copy.ts`](content/copy.ts). Placeholders are marked `[LIKE THIS]`.
-- **Design tokens and the orange register:** [`content/tokens.ts`](content/tokens.ts) and the top of [`app/globals.css`](app/globals.css). Both follow the brand guideline in Figma (MonoBook Presentations, Guideline).
+- **Brief:** [`docs/BRIEF.md`](docs/BRIEF.md). If anything conflicts with it, the brief wins.
+- **Copy:** [`content/copy.ts`](content/copy.ts). Placeholders are marked `[LIKE THIS]`.
+- **Design tokens:** the top of [`app/globals.css`](app/globals.css). Where orange may appear: [`content/tokens.ts`](content/tokens.ts).
+- **Logo vectors:** [`content/logo.json`](content/logo.json), exported from the Figma brand guideline.
 
 ## Stack
 
-- Next.js 16 (App Router), TypeScript in strict mode, static export (`output: "export"`).
-- GSAP + ScrollTrigger for scroll animation. Lenis for smooth scroll. Both load lazily after first paint.
-- Inter (headings) and Manrope (text) via `next/font/google`, as in the brand guideline. Both are self-hosted at build time, so visitors make no request to Google.
-- No CMS, no tracking. Logos are inline SVG exported from Figma. The only photos are MonoBook's own brand mockups in `public/brand/` (WebP at 800, 1400 and 2400px, lazy-loaded).
+Next.js 16 (App Router) as a static export, TypeScript in strict mode. GSAP with ScrollTrigger and Lenis for motion, loaded after the page is idle. Inter and Manrope through `next/font`, self-hosted at build time. No CMS, no tracking, no cookies.
 
-## Run, build, export
+## Run and build
 
-Needs Node 20 or newer.
+Node 20.9 or newer (`.nvmrc` pins 22).
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
-npm run build        # static export into out/
-npm start            # serve out/ locally
+npm run dev     # http://localhost:3000
+npm run build   # static export into out/
+npm start       # serve out/ on http://127.0.0.1:3000
 ```
 
-`npm run build` runs `prebuild` first, which writes `public/og.png` (the social share image) from the main line in `content/copy.ts`.
+`npm run build` first runs `scripts/brand-assets.mjs`, which draws `og.png`, `logo.png` and the PNG icons into `public/` from the same vectors the site uses. Those files are build output and are not committed.
 
-### Deploying the static export
+## Deploy
 
-Upload the `out/` folder to any static host (Netlify, Vercel, Cloudflare Pages, S3 + CloudFront, nginx). There is no server code. Before going live:
+Upload `out/` to any static host. Build command `npm run build`, output directory `out`.
 
-1. `site.url` (https://monobook.co) and `site.email` (mehedi@monobook.co) are set in `content/copy.ts`. The URL feeds the canonical URL, sitemap, robots file and Open Graph tags.
-2. Make sure the host serves text files with gzip or brotli. All the common hosts do this by default, and the Lighthouse score depends on it.
+- **Vercel** reads `vercel.json`; **Netlify** and **Cloudflare Pages** read `public/_headers` and `public/_redirects`. Both set the security headers (CSP, HSTS, nosniff, referrer and permissions policy), send `www` to the bare domain, and keep Next's `.txt` data files out of search.
+- Make sure the host serves `404.html` with a 404 status. Netlify and Cloudflare Pages do this on their own.
+- On another host, copy those headers and the redirect into its config.
 
 ## Checks
 
-Each review team's checklist is automated where it can be.
+| Command | What it checks |
+|---|---|
+| `npm run typecheck` | TypeScript, strict |
+| `npm run lint` | ESLint, Next core web vitals |
+| `npm run check:brief` | The brief's hard rules against the built page and the source: no prices, statistics, banned words or dashes; quote word for word; own-brand images only; palette colours only, in any notation; orange only where registered; no blue, caps styling, gradients or shadows; Inter and Manrope only; five deliverables and the page in order; one H1 |
+| `npm run check:mobile` | 320 to 768px: no sideways scroll, one column, text 17px+, tap targets 44px+, full-width buttons. axe-core WCAG 2.1 AA with and without reduced motion. Every link and button reachable by Tab straight after load. Deep links land under the header |
+| `npm run check:lighthouse` | Lighthouse mobile, median of three runs, must be 90+. Report in `reports/` |
+| `npm run check` | All of the above |
+| `npm run shots` | Screenshots into `reports/shots/` |
 
-| Command | What it checks | Team |
-|---|---|---|
-| `npm run typecheck` | TypeScript strict, zero errors | Code Quality |
-| `npm run lint` | ESLint (Next core web vitals + TypeScript) | Code Quality |
-| `npm run check:brief` | 16 hard rules from the brief, against the built page and the source: prices, statistics, banned words, dashes, caps, exact tokens, orange only where registered, no blue, Inter and Manrope only, own-brand images only, no gradients or shadows, five deliverables in order, page order, quote word for word, one H1 | Brief Guardian, Visual Design |
-| `npm run check:mobile` | 375, 390 and 768px: no horizontal scroll, body 17px+, tap targets 44px+, one column, full-width buttons. axe-core WCAG 2.1 AA on load and after scrolling, with and without reduced motion. Keyboard: skip link, visible focus, heading order | Mobile, Accessibility |
-| `npm run check:lighthouse` | Lighthouse mobile, 3 runs, median must be 90+. Report saved to `reports/` | Performance, SEO |
-| `npm run check` | All of the above, in order | |
-| `npm run shots` | Full-page screenshots (desktop, mobile, reduced motion) into `reports/shots/` | Dev helper |
-
-The browser checks use Playwright's Chromium. On Windows, set `CHROME_PATH` to your Chrome (for example `C:/Program Files/Google/Chrome/Application/chrome.exe`) for Lighthouse. If Playwright is not installed globally, run `npm i -D playwright && npx playwright install chromium`. Set `CHROME_PATH` to use another Chromium for Lighthouse.
-
-## Folder structure
-
-```
-app/
-  layout.tsx          fonts, metadata, motion provider
-  page.tsx            the page, in brief order
-  globals.css         tokens, type scale, 12-col grid, all styles
-  sitemap.ts, robots.ts, icon.svg
-components/
-  motion/             MotionProvider (Lenis), Reveal, PinnedMoment, useScrollMotion, lazy loaders
-  sections/           Header, Hero, Showcase, Problem, Deliverables (+ progress line), Pace, Needs, Proof, Contact, Footer
-  demos/              the five small deliverable demos (placeholder shapes only)
-  ui/                 Section, Label, Logo, ScrollLink, StructuredData
-content/
-  copy.ts             every word on the site
-  tokens.ts           colour tokens and the orange usage register
-docs/BRIEF.md
-scripts/              check scripts and the OG image builder
-```
+The browser checks drive your installed Chrome through puppeteer-core. Set `CHROME_PATH` to use another Chromium.
 
 ## Motion
 
-- **Lenis:** gentle smooth scroll, driven by the GSAP ticker and synced with ScrollTrigger.
-- **Hero:** the lines rise one by one on load. This is a CSS animation, so it needs no JavaScript and keeps LCP low.
-- **Problem:** words go from Muted to Ink as you scroll. Two grey marks slide together and become one orange mark.
-- **Deliverables:** on screens 900px and wider, each one pins briefly while its parts fade and rise in. Below 900px there is no pinning, only a gentle reveal.
-- **Reduced motion:** when `prefers-reduced-motion: reduce` is set, Lenis is never created and every GSAP effect is skipped. The page shows its final, static layout.
-- **Cleanup:** every component's tweens, ScrollTriggers and matchMedia are created inside `gsap.context` and reverted on unmount.
+- **Lenis** smooth scroll on mouse and trackpad. Touch devices keep native scrolling.
+- **Hero:** the lines rise on load in plain CSS, so the first paint needs no script.
+- **Problem:** the sentence darkens word by word; two mismatched marks slide together and resolve into the Mk. tile.
+- **Deliverables:** on screens at least 900px wide and 760px tall, each one pins briefly and the Mk. tile lands on its demo. Elsewhere the parts reveal once.
+- **Sprint day:** the timeline draws itself and each step's dot lands in turn.
+- **Reveals** animate opacity only, never visibility, so content waiting to appear stays in the tab order, in find-in-page and in print.
+- **Scroll keeper** (`components/motion/scrollKeeper.ts`): pins add height after the browser has scrolled, so it puts deep links, reloads and resizes back on the right block.
+- **Reduced motion:** Lenis is never created and every GSAP effect is skipped, including when the setting changes while the page is open.
 
-## Design rules (from the brief)
+## Before launch
 
-- Colours from the guideline: Orange `#ED3614`, Black `#0B0B0B`, White `#FBFBFB`, Grey `#ABABAB`, plus two tints mixed from them: Stone `#EFEFEF` and Muted `#5E5E5E`. Placeholder greys are Black at low opacity, so no other colours enter.
-- Orange appears only where `BRAND_USES` in `content/tokens.ts` lists it. Adding an unlisted use fails `check:brief`.
-- Inter for headings, Manrope for text (both SIL Open Font License). No serif, no script, no ALL CAPS styling.
-- No gradients, shadows, stock photos, icon grids, carousels, badges, countdowns or emoji.
-
-## Placeholders still to fill
-
-All of these are in `content/copy.ts`.
-
-| Placeholder | Where | What it is |
-|---|---|---|
-| `[MAYFAIR BEFORE IMAGE]`, `[MAYFAIR AFTER IMAGE]` | `proof.images` | Before and after frames in the Proof chapter. When the images are ready, swap the frames in `components/sections/Proof.tsx` and add their path to the allowed image folders in `scripts/brief-check.mjs` (rule 4) |
-| `[YOUR COMPANY]`, `[NAME]`, `[PHONE]` | `demos.logo`, `demos.guidelines` | Text on the demo business card and guidelines cover. They can stay, since they stand for a client's details |
-| `[PLACEHOLDER]` | `demos.colour.value` | Print and screen values on the demo swatches |
-| `[INVOICE REF]` | `demos.typeface.invoiceRef` | Reference on the demo invoice line |
-| `[PHOTO]` | `demos.image.photo` | The six frames in the image style demo |
-
-## Written from the brief, please confirm
-
-These lines are not word for word from the brief. Check that they match how the studio actually works:
-
-- `hero.sub`: "We make your vans, signs, quotes and website look like one company. For established trade and service firms in the UK."
-- `pace.heading`: "Same five parts. You choose the pace."
-- `needs.heading` and `needs.note`: "Send these and we can start." / "One email with all of it is enough."
-- `demos.image.rules`: "Same light, Same angle, Your own jobs"
+| Item | Where |
+|---|---|
+| Mayfair before and after images, `[MAYFAIR BEFORE IMAGE]` and `[MAYFAIR AFTER IMAGE]` | `proof.images` in `content/copy.ts`, frames in `components/sections/Proof.tsx` |
+| Lines written from the brief rather than quoted from it: `hero.sub`, `pace.heading`, `pace.intro`, `pace.options[].body`, `needs.heading`, `needs.note`, `demos.image.rules`, `footer.hours` | `content/copy.ts` |

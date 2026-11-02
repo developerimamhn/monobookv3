@@ -4,24 +4,22 @@ import { Section } from "@/components/ui/Section";
 import { proof } from "@/content/copy";
 
 /**
- * The only proof on the site: Mayfair Lumber and Eric Dahl's words.
- * A dark chapter, set like a case study. No client logo, no link to their site.
+ * The only proof on the site: Mayfair Lumber and Eric Dahl's words, set like
+ * a case study. No client logo and no link to their site.
  */
 export function Proof() {
   const { before, after } = proof.images;
   return (
-    <Section id="proof" tone="ink" labelledBy="proof-title" className="proof">
-      <Reveal className="grid">
-        <div className="col-12">
-          <Label index={proof.index}>{proof.label}</Label>
-        </div>
-        <p className="lead proof-intro col-6">{proof.intro}</p>
-      </Reveal>
-
-      <Reveal as="article" className="proof-case">
+    <Section id="proof" tone="ink" labelledBy="proof-title">
+      <Reveal>
+        <Label index={proof.index}>{proof.label}</Label>
         <h2 id="proof-title" className="proof-company">
           {proof.card.company}
         </h2>
+        <p className="lead proof-intro">{proof.intro}</p>
+      </Reveal>
+
+      <Reveal as="article" className="proof-case">
         <div className="grid proof-body">
           <dl className="proof-facts col-5">
             {proof.card.facts.map((fact) => (
@@ -31,7 +29,7 @@ export function Proof() {
               </div>
             ))}
           </dl>
-          <div className="proof-did col-6 start-7">
+          <div className="col-6 start-7">
             <p className="proof-did-label">{proof.card.didLabel}</p>
             <p className="proof-did-text">{proof.card.did}</p>
           </div>

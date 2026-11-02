@@ -1,22 +1,21 @@
+import { LogoTile } from "@/components/ui/Logo";
+import { pad2 } from "@/components/ui/format";
 import { demos } from "@/content/copy";
 
-const t = demos.guidelines;
+const copy = demos.guidelines;
 
-/** A document cover beside its list of pages. */
 export function GuidelinesDemo() {
   return (
-    <figure className="demo demo-guidelines" role="img" aria-label={t.figureLabel}>
+    <figure className="demo demo-guidelines" role="img" aria-label={copy.figureLabel}>
       <div className="doc-cover" aria-hidden="true">
-        <svg viewBox="0 0 40 40" className="doc-mark">
-          <circle className="mark-fill" cx="20" cy="20" r="16" />
-        </svg>
-        <span className="doc-title">{t.cover}</span>
-        <span className="doc-company">{t.company}</span>
+        <LogoTile className="doc-mark" data-stamp="" />
+        <span className="doc-title">{copy.cover}</span>
+        <span className="doc-company">{copy.company}</span>
       </div>
       <ol className="doc-pages" aria-hidden="true">
-        {t.pages.map((page, i) => (
+        {copy.pages.map((page, i) => (
           <li key={page}>
-            <span className="doc-page-num">{String(i + 1).padStart(2, "0")}</span>
+            <span className="doc-page-num">{pad2(i + 1)}</span>
             {page}
           </li>
         ))}

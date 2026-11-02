@@ -4,3 +4,9 @@ out/
 next-env.d.ts
 *.tsbuildinfo
 reports/
+
+# Drawn by scripts/brand-assets.mjs before every build
+public/og.png
+public/logo.png
+public/icon-*.png
+public/apple-touch-icon.png

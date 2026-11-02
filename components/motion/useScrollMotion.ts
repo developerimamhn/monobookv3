@@ -1,44 +1,35 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
-import { loadGsap, prefersReducedMotion, whenIdle, type MotionLib } from "./loadMotion";
+import { useEffect, useEffectEvent, type RefObject } from "react";
+import { loadMotion, queueRefresh, type MotionLib } from "./loadMotion";
+import { useMotion } from "./MotionProvider";
 
 type Setup = (lib: MotionLib, scope: HTMLElement) => void | (() => void);
 
 /**
- * Run a GSAP setup for one component, scoped to its root element.
- * - Skipped entirely under prefers-reduced-motion.
- * - Waits for idle, then loads GSAP + ScrollTrigger once for the whole page.
- * - Everything created inside (tweens, ScrollTriggers, matchMedia) is
- *   reverted on unmount through gsap.context.
+ * Runs a GSAP setup scoped to one element. Everything it creates is reverted
+ * through gsap.context on unmount, or as soon as the visitor turns on reduced motion.
  */
 export function useScrollMotion(ref: RefObject<HTMLElement | null>, setup: Setup) {
+  const { reduced } = useMotion();
+  const run = useEffectEvent(setup);
+
   useEffect(() => {
     const scope = ref.current;
-    if (!scope || prefersReducedMotion()) return;
+    if (!scope || reduced) return;
     let cancelled = false;
     let revert: (() => void) | undefined;
 
-    whenIdle()
-      .then(loadGsap)
-      .then((lib) => {
-        if (cancelled) return;
-        let extra: void | (() => void);
-        const ctx = lib.gsap.context(() => {
-          extra = setup(lib, scope);
-        }, scope);
-        revert = () => {
-          if (typeof extra === "function") extra();
-          ctx.revert();
-        };
-        lib.ScrollTrigger.refresh();
-      });
+    loadMotion().then((lib) => {
+      if (cancelled) return;
+      const ctx = lib.gsap.context(() => run(lib, scope), scope);
+      revert = () => ctx.revert();
+      queueRefresh(lib.ScrollTrigger);
+    });
 
     return () => {
       cancelled = true;
       revert?.();
     };
-    // setup is defined inline by callers and is stable in intent; run once per mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref]);
+  }, [ref, reduced]);
 }

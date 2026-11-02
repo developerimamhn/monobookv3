@@ -1,18 +1,10 @@
 /**
- * All site copy lives here. Source of truth: docs/BRIEF.md.
- * Placeholders are marked [LIKE THIS] and listed in README.md.
- *
- * House rules (checked by `npm run check:brief`):
- * - No prices, no revenue or growth claims, no invented numbers.
- * - No banned words (see scripts/brief-check.mjs).
- * - Hyphens only, never em or en dashes.
- * - Plain, peer-to-peer English. Short sentences.
- * - Only one client and one review: Mayfair Lumber and Eric Dahl.
+ * Every word on the site. docs/BRIEF.md is the source; `npm run check:brief`
+ * enforces its hard rules. Placeholders are marked [LIKE THIS].
  */
 
 export const site = {
   name: "MonoBook Brand Architects",
-  shortName: "MonoBook",
   url: "https://monobook.co",
   email: "mehedi@monobook.co",
   owner: "Mehedi Hasan",
@@ -20,11 +12,13 @@ export const site = {
 } as const;
 
 export const meta = {
-  title: "MonoBook Brand Architects - Brand identity for UK trade and service businesses",
+  title: "Brand Identity Design for UK Trade Businesses | MonoBook",
   description:
-    "Your business works. It just does not look like it does. We build the logo, colour, typeface, image style and guidelines that your vans, signs, quotes and website share.",
+    "Logo, colour, typeface, image style and brand guidelines for UK trade and service businesses. In one working day, seven days or fourteen.",
   ogAlt: "MonoBook Brand Architects. Your business works. It just does not look like it does.",
 } as const;
+
+type NavItem = { href: `#${string}`; label: string };
 
 export const header = {
   wordmarkLabel: "MonoBook Brand Architects, back to top",
@@ -32,20 +26,18 @@ export const header = {
   nav: [
     { href: "#deliverables", label: "What you get" },
     { href: "#pace", label: "Process" },
+    { href: "#needs", label: "Your brief" },
     { href: "#proof", label: "Proof" },
-  ],
+  ] satisfies NavItem[],
   contact: "Contact",
   skipLink: "Skip to content",
 } as const;
 
 export const hero = {
-  /** Main line from the brief. Split into two lines for the load reveal. */
   lines: ["Your business works.", "It just does not look like it does."],
-  sub: "We make your vans, signs, quotes and website look like one company. For established trade and service firms in the UK.",
-  scroll: "Scroll",
+  sub: "We make your vans, signs, quotes and website look like one company. For established trade and service businesses in the UK.",
 } as const;
 
-/** The studio's own identity, applied. MonoBook's own brand, not a client. */
 export const showcase = {
   label: "Our own identity",
   caption: "We built MonoBook from the same five parts we deliver. One mark, one palette, one type system, on every card, sheet and tube.",
@@ -74,7 +66,7 @@ export const problem = {
   statement:
     "A customer who sees one logo on your van and another on your quote is looking at two different companies.",
   follow: "You know it is the same firm. They do not.",
-  marksLabel: "Two mismatched logos that merge into one.",
+  marksLabel: "Two mismatched logos that merge into one mark.",
   marksBefore: "Two logos",
   marksAfter: "One company",
 } as const;
@@ -83,7 +75,6 @@ export type DeliverableId = "logo" | "colour" | "typeface" | "image" | "guidelin
 
 export type Deliverable = {
   id: DeliverableId;
-  index: string;
   name: string;
   body: string;
 };
@@ -97,53 +88,54 @@ export const deliverables = {
   items: [
     {
       id: "logo",
-      index: "001",
       name: "Logo",
       body: "A primary and a secondary mark, with sizes and clear space rules. The same company shows up on a business card and on the side of a van.",
     },
     {
       id: "colour",
-      index: "002",
       name: "Colour",
       body: "One palette with exact values for print, screen, vehicle wrap and signage. Your sign maker and your web developer stop guessing.",
     },
     {
       id: "typeface",
-      index: "003",
       name: "Typeface",
       body: "A licensed type system for headings, body and documents. Quotes and invoices start looking like they came from the same company.",
     },
     {
       id: "image",
-      index: "004",
       name: "Image style",
       body: "A standard for job photos. Your own work becomes your proof.",
     },
     {
       id: "guidelines",
-      index: "005",
       name: "Guidelines",
       body: "One document your printer, sign maker, web developer and team can work from without calling you first.",
     },
   ] satisfies Deliverable[],
 } as const;
 
-/** Text used inside the small visual demos for each deliverable. */
+/**
+ * Text inside the deliverable demos. They show MonoBook's own identity, so the
+ * values are real: the palette is the one in the brand guideline.
+ */
 export const demos = {
   logo: {
-    primary: "Primary mark",
-    secondary: "Secondary mark",
-    card: "Business card",
-    van: "Van",
-    cardName: "[YOUR COMPANY]",
-    cardLine: "[NAME] - [PHONE]",
-    figureLabel: "The primary mark on a van and the secondary mark on a business card.",
+    figureLabel: "The MonoBook. wordmark on the side of a van, and the Mk. mark on a business card.",
+    van: "Van, primary mark",
+    card: "Business card, secondary mark",
+    cardName: site.name,
+    cardLine: site.email,
   },
   colour: {
-    figureLabel: "Four colour swatches, each with print and screen values.",
-    rows: ["Print", "Screen"],
-    swatches: ["Primary", "Secondary", "Neutral", "Light"],
-    value: "[PLACEHOLDER]",
+    figureLabel: "The four colours of the MonoBook palette, with their Hex and RGB values.",
+    swatches: [
+      { tone: "orange", name: "Orange", hex: "#ED3614", rgb: "237 54 20" },
+      { tone: "black", name: "Black", hex: "#0B0B0B", rgb: "11 11 11" },
+      { tone: "white", name: "White", hex: "#FBFBFB", rgb: "251 251 251" },
+      { tone: "grey", name: "Grey", hex: "#ABABAB", rgb: "171 171 171" },
+    ],
+    hexLabel: "Hex",
+    rgbLabel: "RGB",
   },
   typeface: {
     figureLabel: "A heading, a paragraph and an invoice line set in the same family.",
@@ -153,17 +145,17 @@ export const demos = {
     body: "Remove the old units, refit the new ones and leave the room clean.",
     invoiceLabel: "Invoice line",
     invoiceItem: "Labour and materials",
-    invoiceRef: "[INVOICE REF]",
+    invoiceTerms: "Due on completion",
   },
   image: {
-    figureLabel: "A grid of six photo frames following one standard.",
-    photo: "[PHOTO]",
+    figureLabel: "Three photos of MonoBook's own work, shot to one standard.",
+    photos: ["business-card", "stationery", "poster-tube"],
     rules: ["Same light", "Same angle", "Your own jobs"],
   },
   guidelines: {
     figureLabel: "A guidelines document cover with its list of pages.",
     cover: "Brand guidelines",
-    company: "[YOUR COMPANY]",
+    company: site.name,
     pages: ["Logo and clear space", "Colour values", "Type system", "Image style", "Vans and signs", "Documents"],
   },
 } as const;
@@ -172,12 +164,12 @@ export const pace = {
   index: "03",
   label: "Process",
   heading: "Same five parts. You choose the pace.",
-  intro: "Logo, Colour, Typeface, Image style and Guidelines, every time. The work is identical.",
+  intro: "Your brand identity in one working day, seven days or fourteen days.",
   options: [
     {
       name: "Sprint",
       length: "One working day",
-      body: "The whole studio works on your project that day. You receive all five parts by the end of it.",
+      body: "Your new identity, start to finish, in one working day.",
     },
     {
       name: "Standard",
@@ -187,11 +179,11 @@ export const pace = {
     {
       name: "Extended",
       length: "Fourteen days",
-      body: "The same work as seven days, at a slower cadence.",
+      body: "The same work as Standard, at a slower cadence.",
     },
   ],
   sprint: {
-    heading: "How the sprint day runs",
+    heading: "How the one-day sprint runs",
     steps: [
       {
         when: "Before the day",
@@ -228,8 +220,9 @@ export const needs = {
     "Photos of your van, signs and workwear.",
   ],
   note: "One email with all of it is enough.",
-  button: "Send your brief",
+  button: "Email your brief",
   subject: "Brief for MonoBook",
+  emailIntro: "Answer what you can. Attach your logo and photos.",
 } as const;
 
 export const proof = {
@@ -243,7 +236,6 @@ export const proof = {
       { term: "Business", value: "Wholesale lumber and remanufacturing" },
       { term: "Where", value: "Alberta, Canada" },
       { term: "History", value: "Canadian owned since 1976" },
-      { term: "Scope", value: "Mark, colour, type and an applied identity system across print, signage and digital" },
       { term: "Led by", value: "Mehedi Hasan, owner of MonoBook" },
     ],
     didLabel: "What we did",
@@ -254,7 +246,7 @@ export const proof = {
     after: { label: "After", placeholder: "[MAYFAIR AFTER IMAGE]" },
     figureLabel: "Mayfair Lumber identity before and after the rebrand. Images to follow.",
   },
-  /** Word for word from the client. Do not edit. */
+  /** Word for word from the client. Do not edit, not even the spelling. */
   quote:
     "Mehedi was hired to do a visual rebrand for our 40+ year organization. He was an excellent communicator, showed exceptional passion for the project, and delivered a finished product exactly what we were hoping for.",
   cite: "Eric Dahl, Client, December 2023",
@@ -266,21 +258,31 @@ export const contact = {
   heading: "Tell us what your business does and where your name shows up.",
   emailLabel: "Email",
   note: "Email only. We reply within two hours, during UK working hours.",
+  copy: "Copy address",
+  copied: "Address copied",
 } as const;
+
+export const mobileCta = "Email us";
 
 export const footer = {
   name: "MonoBook Brand Architects",
-  address: ["Thana Road, Kaliganj", "Satkhira 9440, Khulna Division", "Bangladesh"],
-  /** The same address, split for search engines (schema.org). */
   postal: {
     street: "Thana Road, Kaliganj",
     locality: "Satkhira",
     postalCode: "9440",
     region: "Khulna Division",
-    country: "BD",
+    country: "Bangladesh",
+    countryCode: "BD",
   },
+  hours: "Working UK hours, by email.",
   studioLabel: "Studio",
   contactLabel: "Contact",
   pagesLabel: "On this page",
   backToTop: "Back to top",
+} as const;
+
+export const notFound = {
+  title: "Page not found",
+  body: "There is nothing at this address. The whole site is one page.",
+  link: "Go to the home page",
 } as const;

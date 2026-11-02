@@ -1,48 +1,67 @@
-/**
- * GSAP, ScrollTrigger and Lenis are loaded lazily, after first paint, so
- * they never block the first render (Lighthouse mobile budget).
- * Only ScrollTrigger is registered. No other GSAP plugins ship.
+/*
+ * GSAP, ScrollTrigger and Lenis load after the page is idle, so they never
+ * hold up the first paint. Every component shares the same idle promise and
+ * the same GSAP import, which means all setups run in one tick and can share
+ * a single ScrollTrigger.refresh().
  */
 import type { gsap as GsapType } from "gsap";
 import type { ScrollTrigger as ScrollTriggerType } from "gsap/ScrollTrigger";
 
 export type MotionLib = { gsap: typeof GsapType; ScrollTrigger: typeof ScrollTriggerType };
 
-let gsapPromise: Promise<MotionLib> | null = null;
+const NO_PREF = "(prefers-reduced-motion: no-preference)";
 
-export function loadGsap(): Promise<MotionLib> {
-  gsapPromise ??= Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([g, st]) => {
-    g.gsap.registerPlugin(st.ScrollTrigger);
-    return { gsap: g.gsap, ScrollTrigger: st.ScrollTrigger };
+export const queries = {
+  reduced: "(prefers-reduced-motion: reduce)",
+  // Pins need room: a wide screen that is also tall enough to show a whole panel.
+  pin: `(min-width: 900px) and (min-height: 760px) and ${NO_PREF}`,
+  noPin: `(max-width: 899.98px) and ${NO_PREF}, (max-height: 759.98px) and ${NO_PREF}`,
+} as const;
+
+export const motion = {
+  ease: "power3.out",
+  duration: 0.8,
+  rise: 32,
+  stagger: 0.08,
+} as const;
+
+let idle: Promise<void> | null = null;
+let lib: Promise<MotionLib> | null = null;
+
+function whenIdle() {
+  idle ??= new Promise((resolve) => {
+    const run = () => {
+      if ("requestIdleCallback" in window) window.requestIdleCallback(() => resolve(), { timeout: 1200 });
+      else setTimeout(resolve, 200);
+    };
+    if (document.readyState === "complete") run();
+    else window.addEventListener("load", run, { once: true });
   });
-  return gsapPromise;
+  return idle;
+}
+
+export function loadMotion(): Promise<MotionLib> {
+  lib ??= whenIdle()
+    .then(() => Promise.all([import("gsap"), import("gsap/ScrollTrigger")]))
+    .then(([g, st]) => {
+      g.gsap.registerPlugin(st.ScrollTrigger);
+      return { gsap: g.gsap, ScrollTrigger: st.ScrollTrigger };
+    });
+  return lib;
 }
 
 export function loadLenis() {
   return import("lenis").then((m) => m.default);
 }
 
-/** Resolve after the browser is idle (or a short timeout), once the page has painted. */
-export function whenIdle(timeout = 1200): Promise<void> {
-  return new Promise((resolve) => {
-    const run = () => {
-      if ("requestIdleCallback" in window) window.requestIdleCallback(() => resolve(), { timeout });
-      else setTimeout(resolve, 200);
-    };
-    if (document.readyState === "complete") run();
-    else window.addEventListener("load", run, { once: true });
+let refreshQueued = false;
+
+/** Twenty components each asking for a refresh in the same frame get one. */
+export function queueRefresh(ScrollTrigger: MotionLib["ScrollTrigger"]) {
+  if (refreshQueued) return;
+  refreshQueued = true;
+  requestAnimationFrame(() => {
+    refreshQueued = false;
+    ScrollTrigger.refresh();
   });
 }
-
-/** Shared motion settings. Slow and quiet. */
-export const motion = {
-  ease: "power2.out",
-  duration: 1.2,
-  rise: 24,
-  okQuery: "(prefers-reduced-motion: no-preference)",
-  /** Deliverables pin only on wide screens. */
-  pinQuery: "(min-width: 900px) and (prefers-reduced-motion: no-preference)",
-  mobileQuery: "(max-width: 899.98px) and (prefers-reduced-motion: no-preference)",
-} as const;
-
-export const prefersReducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;

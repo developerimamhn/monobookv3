@@ -1,11 +1,14 @@
 import { Reveal } from "@/components/motion/Reveal";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
+import { pad2 } from "@/components/ui/format";
 import { needs, site } from "@/content/copy";
 
-/** What the client sends before work starts, as one numbered list. */
+// The email opens with the seven questions already in it, ready to fill in.
+const body = [needs.emailIntro, "", ...needs.items.flatMap((item, i) => [`${i + 1}. ${item}`, "", ""])].join("\n");
+const mailto = `mailto:${site.email}?subject=${encodeURIComponent(needs.subject)}&body=${encodeURIComponent(body)}`;
+
 export function Needs() {
-  const mailto = `mailto:${site.email}?subject=${encodeURIComponent(needs.subject)}`;
   return (
     <Section id="needs" tone="paper" labelledBy="needs-title" className="needs">
       <div className="grid">
@@ -15,7 +18,7 @@ export function Needs() {
             {needs.heading}
           </h2>
           <p className="lead needs-note">{needs.note}</p>
-          <a className="button button-outline needs-button" href={mailto}>
+          <a className="button needs-button" href={mailto}>
             {needs.button}
           </a>
         </Reveal>
@@ -23,7 +26,7 @@ export function Needs() {
           {needs.items.map((item, i) => (
             <li key={item}>
               <span className="needs-num" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
+                {pad2(i + 1)}
               </span>
               <span>{item}</span>
             </li>

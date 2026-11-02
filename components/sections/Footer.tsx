@@ -2,18 +2,24 @@ import { ScrollLink } from "@/components/ui/ScrollLink";
 import { LogoTile, Wordmark } from "@/components/ui/Logo";
 import { footer, header, site } from "@/content/copy";
 
+const { postal } = footer;
+const addressLines = [postal.street, `${postal.locality} ${postal.postalCode}, ${postal.region}`, postal.country];
+
 export function Footer() {
   return (
     <footer className="site-footer">
       <div className="container">
         <div className="grid site-footer-cols">
-          <address className="footer-col col-4">
+          <div className="footer-col col-4">
             <span className="footer-label">{footer.studioLabel}</span>
-            <span className="footer-name">{footer.name}</span>
-            {footer.address.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-          </address>
+            <address className="footer-address">
+              <span>{footer.name}</span>
+              {addressLines.map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+            </address>
+            <span className="footer-hours">{footer.hours}</span>
+          </div>
           <div className="footer-col col-3">
             <span className="footer-label">{footer.contactLabel}</span>
             <a href={`mailto:${site.email}`} className="footer-link">
@@ -25,7 +31,7 @@ export function Footer() {
             <ul>
               {header.nav.map((item) => (
                 <li key={item.href}>
-                  <ScrollLink href={item.href as `#${string}`} className="footer-link">
+                  <ScrollLink href={item.href} className="footer-link">
                     {item.label}
                   </ScrollLink>
                 </li>

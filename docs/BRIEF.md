@@ -66,8 +66,8 @@ Source: the MonoBook brand guideline in Figma (file "MonoBook Presentations", pa
   - Mk. mark: White letters on the orange square. Favicon and footer.
 - Colours (guideline page 11): Primary Orange #ED3614, Black #0B0B0B, White #FBFBFB, Grey #ABABAB.
   - Black is all text and the dark chapters (Proof, footer). White is the main background. Grey is for lines and placeholders only, because it is too light for text.
-  - Two working tints, mixed from the palette: Stone #EFEFEF (White with 5% Black) for alternate sections, Muted #5E5E5E (Black at 66% on White) for body and captions.
-  - Orange is the signature, kept for a few moments listed in content/tokens.ts (BRAND_USES): header wordmark, the hero's second line, the merged mark, the progress line, the Contact chapter and the Mk. tile.
+  - Two working tints, mixed from the palette: Stone #EFEFEF (White with 5% Black) for alternate sections, Muted #5E5E5E (Black at about 66% on White) for body and captions.
+  - Orange is the signature, kept for a few moments listed in content/tokens.ts (BRAND_USES): header wordmark, the hero's second line, the Mk. tile (footer, the Problem merge and the demos), the progress line, the Orange swatch in the colour demo and the Contact chapter.
   - Orange text only at large sizes (24px and up), where it passes WCAG AA. On the orange Contact chapter, large text is White and small text is Black.
 - Type (guideline pages 14 and 15): Inter for headings and brand areas, Manrope for paragraphs and short text. No serif, no script, no ALL CAPS.
 - No blue anywhere.

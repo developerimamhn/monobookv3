@@ -1,13 +1,14 @@
 import { Contact } from "@/components/sections/Contact";
 import { Deliverables } from "@/components/sections/Deliverables";
-import { Header } from "@/components/sections/Header";
 import { Footer } from "@/components/sections/Footer";
+import { Header } from "@/components/sections/Header";
 import { Hero } from "@/components/sections/Hero";
+import { MobileCta } from "@/components/sections/MobileCta";
 import { Needs } from "@/components/sections/Needs";
 import { Pace } from "@/components/sections/Pace";
 import { Problem } from "@/components/sections/Problem";
-import { Showcase } from "@/components/sections/Showcase";
 import { Proof } from "@/components/sections/Proof";
+import { Showcase } from "@/components/sections/Showcase";
 
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
+      <MobileCta />
     </>
   );
 }

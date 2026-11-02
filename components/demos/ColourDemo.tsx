@@ -1,23 +1,23 @@
 import { demos } from "@/content/copy";
 
-const t = demos.colour;
-const tones = ["swatch--1", "swatch--2", "swatch--3", "swatch--4"] as const;
+const copy = demos.colour;
 
-/** Four swatches, each with print and screen values left as placeholders. */
 export function ColourDemo() {
   return (
-    <figure className="demo demo-colour" role="img" aria-label={t.figureLabel}>
+    <figure className="demo" role="img" aria-label={copy.figureLabel}>
       <ul className="swatches" aria-hidden="true">
-        {t.swatches.map((name, i) => (
-          <li key={name} className="swatch">
-            <span className={`swatch-chip ${tones[i]}`} />
-            <span className="swatch-name">{name}</span>
-            {t.rows.map((row) => (
-              <span key={row} className="swatch-row">
-                <span>{row}</span>
-                <span>{t.value}</span>
-              </span>
-            ))}
+        {copy.swatches.map((swatch) => (
+          <li key={swatch.name} className="swatch">
+            <span className={`swatch-chip swatch--${swatch.tone}`} />
+            <span className="swatch-name">{swatch.name}</span>
+            <span className="swatch-row">
+              <span>{copy.hexLabel}</span>
+              <span>{swatch.hex}</span>
+            </span>
+            <span className="swatch-row">
+              <span>{copy.rgbLabel}</span>
+              <span>{swatch.rgb}</span>
+            </span>
           </li>
         ))}
       </ul>

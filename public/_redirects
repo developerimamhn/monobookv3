@@ -1,0 +1,2 @@
+# Netlify: one canonical host.
+https://www.monobook.co/* https://monobook.co/:splat 301!

@@ -1,9 +1,10 @@
 import { Reveal } from "@/components/motion/Reveal";
+import { CopyEmail } from "@/components/ui/CopyEmail";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
 import { contact, site } from "@/content/copy";
 
-/** The closing chapter: one line, then the address itself as the one big call to action. */
+/** The closing chapter: one line, then the address itself as the call to action. */
 export function Contact() {
   return (
     <Section id="contact" tone="brand" labelledBy="contact-title" className="contact">
@@ -23,7 +24,10 @@ export function Contact() {
             </svg>
           </span>
         </a>
-        <p className="contact-note">{contact.note}</p>
+        <div className="contact-foot">
+          <p className="contact-note">{contact.note}</p>
+          <CopyEmail email={site.email} label={contact.copy} done={contact.copied} />
+        </div>
       </Reveal>
     </Section>
   );

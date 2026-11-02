@@ -6,26 +6,10 @@ import { StructuredData } from "@/components/ui/StructuredData";
 import { meta, site } from "@/content/copy";
 import "./globals.css";
 
-/*
- * The two typefaces from the MonoBook brand guideline (Figma, pages 14 and 15):
- * Inter for headings and brand areas, Manrope for paragraphs and short text.
- * Both are open source (SIL OFL) variable fonts. next/font self-hosts them at
- * build time, so there is no request to Google from the visitor's browser and
- * no layout shift (size-adjusted fallbacks).
- */
-const inter = Inter({
-  subsets: ["latin"],
-  weight: "variable",
-  display: "swap",
-  variable: "--font-inter",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: "variable",
-  display: "swap",
-  variable: "--font-manrope",
-});
+// The guideline's two families: Inter for headings, Manrope for text.
+// next/font self-hosts both at build time, so visitors make no request to Google.
+const inter = Inter({ subsets: ["latin"], weight: "variable", display: "swap", variable: "--font-inter" });
+const manrope = Manrope({ subsets: ["latin"], weight: "variable", display: "swap", variable: "--font-manrope" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -33,6 +17,13 @@ export const metadata: Metadata = {
   description: meta.description,
   applicationName: site.name,
   alternates: { canonical: "/" },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     type: "website",
     url: "/",
@@ -46,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: meta.title,
     description: meta.description,
-    images: ["/og.png"],
+    images: [{ url: "/og.png", alt: meta.ogAlt }],
   },
   robots: { index: true, follow: true },
 };

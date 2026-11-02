@@ -1,21 +1,18 @@
 import { demos } from "@/content/copy";
 
-const t = demos.image;
-const frames = ["a", "b", "c", "d", "e", "f"] as const;
+const copy = demos.image;
 
-/** A grid of photo frames that all follow one standard. */
 export function ImageDemo() {
   return (
-    <figure className="demo demo-image" role="img" aria-label={t.figureLabel}>
+    <figure className="demo" role="img" aria-label={copy.figureLabel}>
       <div className="photo-grid" aria-hidden="true">
-        {frames.map((f) => (
-          <span key={f} className="photo-frame">
-            {t.photo}
-          </span>
+        {copy.photos.map((name) => (
+          // eslint-disable-next-line @next/next/no-img-element -- static export, the WebP sizes are prebuilt
+          <img key={name} className="photo-frame" src={`/brand/${name}-800.webp`} width={800} height={533} alt="" loading="lazy" decoding="async" />
         ))}
       </div>
       <ul className="photo-rules" aria-hidden="true">
-        {t.rules.map((rule) => (
+        {copy.rules.map((rule) => (
           <li key={rule}>{rule}</li>
         ))}
       </ul>

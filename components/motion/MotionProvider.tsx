@@ -2,39 +2,30 @@
 
 import type Lenis from "lenis";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
-import { loadGsap, loadLenis, whenIdle } from "./loadMotion";
+import { loadLenis, loadMotion, queries, queueRefresh } from "./loadMotion";
+import { createScrollKeeper, headerHeight } from "./scrollKeeper";
 
 type MotionContextValue = {
-  /** True when the visitor asked for reduced motion. */
   reduced: boolean;
-  /** Scroll to an element or to the top. Uses Lenis when it is running. */
-  scrollTo: (target: HTMLElement | "top") => void;
+  /** Scroll so the target sits under the header, then call done. */
+  scrollTo: (target: HTMLElement | "top", done?: () => void) => void;
 };
 
 const MotionContext = createContext<MotionContextValue>({ reduced: true, scrollTo: () => {} });
 
-export function useMotion() {
-  return useContext(MotionContext);
-}
-
-const REDUCED_QUERY = "(prefers-reduced-motion: reduce)";
+export const useMotion = () => useContext(MotionContext);
 
 function subscribe(onChange: () => void) {
-  const mq = window.matchMedia(REDUCED_QUERY);
+  const mq = window.matchMedia(queries.reduced);
   mq.addEventListener("change", onChange);
   return () => mq.removeEventListener("change", onChange);
 }
-const getReduced = () => window.matchMedia(REDUCED_QUERY).matches;
-/* On the server, assume reduced motion so nothing depends on animation. */
+const getReduced = () => window.matchMedia(queries.reduced).matches;
+// The server cannot know, so it renders the still version; nothing depends on motion.
 const getServerReduced = () => true;
 
-/**
- * One motion provider for the whole site.
- * - Lenis smooth scroll, gentle, driven by the GSAP ticker and synced with ScrollTrigger.
- * - Loaded after first paint, so it never slows the first render.
- * - Under prefers-reduced-motion Lenis is never created. Every GSAP effect
- *   is skipped too (see useScrollMotion).
- */
+const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
 export function MotionProvider({ children }: { children: ReactNode }) {
   const reduced = useSyncExternalStore(subscribe, getReduced, getServerReduced);
   const lenisRef = useRef<Lenis | null>(null);
@@ -43,33 +34,36 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     if (reduced) return;
     let cancelled = false;
     let cleanup: (() => void) | undefined;
+    // Touch scrolling is already smooth; Lenis would only add work there.
+    const touch = window.matchMedia("(pointer: coarse)").matches;
 
-    whenIdle()
-      .then(() => Promise.all([loadGsap(), loadLenis()]))
-      .then(([{ gsap, ScrollTrigger }, LenisClass]) => {
-        if (cancelled) return;
-        const lenis = new LenisClass({
-          duration: 1.3,
-          easing: (t: number) => 1 - Math.pow(1 - t, 3),
-          smoothWheel: true,
-          wheelMultiplier: 0.9,
-        });
-        const onTick = (time: number) => lenis.raf(time * 1000);
+    Promise.all([loadMotion(), touch ? null : loadLenis()]).then(([{ gsap, ScrollTrigger }, LenisClass]) => {
+      if (cancelled) return;
+      const lenis = LenisClass ? new LenisClass({ lerp: 0.1, wheelMultiplier: 1 }) : null;
+      const onTick = (time: number) => lenis?.raf(time * 1000);
+      if (lenis) {
         lenis.on("scroll", ScrollTrigger.update);
         gsap.ticker.add(onTick);
         gsap.ticker.lagSmoothing(0);
-        lenisRef.current = lenis;
+      }
+      lenisRef.current = lenis;
 
-        // Measure pins again once the web font has loaded, so nothing shifts.
-        document.fonts?.ready.then(() => !cancelled && ScrollTrigger.refresh());
+      const keeper = createScrollKeeper((y) => (lenis ? lenis.scrollTo(y, { immediate: true, force: true }) : window.scrollTo(0, y)));
+      ScrollTrigger.addEventListener("refresh", keeper.onRefresh);
+      document.fonts.ready.then(() => !cancelled && queueRefresh(ScrollTrigger));
+      queueRefresh(ScrollTrigger);
 
-        cleanup = () => {
+      cleanup = () => {
+        ScrollTrigger.removeEventListener("refresh", keeper.onRefresh);
+        keeper.destroy();
+        if (lenis) {
           gsap.ticker.remove(onTick);
           gsap.ticker.lagSmoothing(500, 33);
           lenis.destroy();
-          lenisRef.current = null;
-        };
-      });
+        }
+        lenisRef.current = null;
+      };
+    });
 
     return () => {
       cancelled = true;
@@ -77,15 +71,21 @@ export function MotionProvider({ children }: { children: ReactNode }) {
     };
   }, [reduced]);
 
-  const scrollTo = useCallback((target: HTMLElement | "top") => {
-    const lenis = lenisRef.current;
-    if (lenis) {
-      lenis.scrollTo(target === "top" ? 0 : target, { duration: 1.6 });
-      return;
-    }
-    if (target === "top") window.scrollTo({ top: 0 });
-    else target.scrollIntoView();
-  }, []);
+  const scrollTo = useCallback(
+    (target: HTMLElement | "top", done?: () => void) => {
+      const y = target === "top" ? 0 : Math.max(0, target.getBoundingClientRect().top + window.scrollY - headerHeight());
+      const lenis = lenisRef.current;
+      if (lenis) {
+        // Short hops stay quick; a jump across the whole page tops out at 1.2s.
+        const duration = Math.min(1.2, 0.5 + Math.abs(y - window.scrollY) / 10000);
+        lenis.scrollTo(y, { duration, easing: easeInOutCubic, onComplete: () => done?.() });
+        return;
+      }
+      window.scrollTo({ top: y, behavior: reduced ? "auto" : "smooth" });
+      done?.();
+    },
+    [reduced],
+  );
 
   const value = useMemo(() => ({ reduced, scrollTo }), [reduced, scrollTo]);
   return <MotionContext.Provider value={value}>{children}</MotionContext.Provider>;

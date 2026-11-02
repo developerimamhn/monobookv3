@@ -3,19 +3,19 @@
    (MonoBook Presentations, Guideline). Colours: Orange, Black, White, Grey.
    Type: Inter for headings, Manrope for text.
    Orange is used only where content/tokens.ts (BRAND_USES) lists it.
-   Check: npm run check:brief.
    ========================================================================== */
 
 :root {
-  /* Colour */
+  color-scheme: light;
+
   /* Guideline palette */
   --brand: #ed3614; /* Primary Color */
   --ink: #0b0b0b; /* Black */
   --paper: #fbfbfb; /* White */
-  --grey: #ababab; /* Grey: lines and placeholders, never text */
+  --grey: #ababab; /* Grey: lines and swatches, never text */
   /* Working tints, mixed from the palette */
   --stone: #efefef; /* White with 5% Black, alternate sections */
-  --muted: #5e5e5e; /* Black at 66% on White, body and captions */
+  --muted: #5e5e5e; /* Black at about 66% on White, body and captions */
   --line: rgba(11, 11, 11, 0.12);
   --line-strong: rgba(11, 11, 11, 0.3);
   /* Placeholder greys are Black at low opacity, so no new colours enter. */
@@ -24,21 +24,22 @@
   /* On Ink chapters, secondary text and lines are Paper at opacity. */
   --paper-muted: rgba(251, 251, 251, 0.7);
   --paper-faint: rgba(251, 251, 251, 0.05);
+  --paper-underline: rgba(251, 251, 251, 0.45);
   --line-dark: rgba(251, 251, 251, 0.18);
 
-  /* Type: one grotesque family, set in app/layout.tsx */
+  /* Two families, set in app/layout.tsx */
   --font-display: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
 
   /* Fluid type scale. Body never drops below 18px. */
-  --text-small: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem); /* 16-17px, captions */
+  --text-small: clamp(1.0625rem, 1.03rem + 0.15vw, 1.125rem); /* 17-18px, captions */
   --text-body: clamp(1.125rem, 1.08rem + 0.25vw, 1.25rem); /* 18-20px */
   --text-lead: clamp(1.25rem, 1.12rem + 0.6vw, 1.625rem); /* 20-26px */
   --text-h3: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
   --text-h2: clamp(2.25rem, 1.6rem + 3.2vw, 4.75rem);
   --text-display: clamp(3rem, 1.6rem + 6.4vw, 8.5rem);
   --text-hero: clamp(3.25rem, 1rem + 7.6vw, 10rem);
-  --text-email: clamp(1.625rem, 0.5rem + 5.4vw, 7.5rem);
+  --text-email: clamp(1.25rem, 0.1rem + 6.2vw, 6.5rem);
 
   /* Spacing, 4px base */
   --space-1: 0.25rem;
@@ -51,14 +52,24 @@
   --space-8: 4rem;
   --space-9: 6rem;
   --space-10: 9rem;
-  --space-section: clamp(6rem, 4rem + 10vw, 14rem);
+  --space-section: clamp(6rem, 4rem + 8vw, 10rem);
 
   /* Layout */
   --gutter: 1rem; /* 16px on phones */
   --column-gap: 1.5rem;
   --max: 90rem;
-  --radius: 4px;
+  --header-h: 4.5rem;
   --tap: 44px;
+  --control-h: 3.5rem;
+  --radius: 4px;
+  --radius-sm: 2px;
+  --radius-pill: 999px;
+
+  /* Stacking */
+  --z-progress: 5;
+  --z-cta: 8;
+  --z-header: 10;
+  --z-skip: 20;
 }
 
 @media (min-width: 768px) {
@@ -90,8 +101,11 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  /* Fixed header: in-page targets and focused elements land below it. */
+  scroll-padding-top: calc(var(--header-h) + var(--space-4));
 }
 
+/* Lenis */
 html.lenis,
 html.lenis body {
   height: auto;
@@ -99,6 +113,14 @@ html.lenis body {
 
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 body {
@@ -143,7 +165,12 @@ button {
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Sections that receive focus from in-page links do not need a ring. */
+[tabindex="-1"]:focus {
+  outline: none;
 }
 
 h1,
@@ -192,20 +219,16 @@ p {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
   /* Span and start are separate custom properties, so .col-N and .start-N combine. */
-  [class^="col-"],
-  [class*=" col-"] { grid-column: var(--start, auto) / span var(--span, 12); }
+  .grid > :where(.col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-12) {
+    grid-column: var(--start, auto) / span var(--span, 12);
+  }
   .col-2 { --span: 2; }
   .col-3 { --span: 3; }
   .col-4 { --span: 4; }
   .col-5 { --span: 5; }
   .col-6 { --span: 6; }
   .col-7 { --span: 7; }
-  .col-8 { --span: 8; }
-  .col-10 { --span: 10; }
   .col-12 { --span: 12; }
-  .start-3 { --start: 3; }
-  .start-4 { --start: 4; }
-  .start-5 { --start: 5; }
   .start-7 { --start: 7; }
   .start-9 { --start: 9; }
 }
@@ -312,23 +335,65 @@ p {
   border: 0;
 }
 
-/* Hero: slow line-by-line rise on load. Pure CSS, so it needs no script.
+/* --- Buttons -------------------------------------------------------------- */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-h);
+  padding: var(--space-4) var(--space-6);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-body);
+  font-weight: 500;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.button:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+@media (max-width: 767.98px) {
+  .button {
+    display: flex;
+    width: 100%;
+  }
+}
+
+/* --- Motion --------------------------------------------------------------- */
+
+/* Hero: line-by-line rise on load. Pure CSS, so it needs no script.
    Starts at a near-zero opacity, so the text still counts as painted for LCP. */
 @media (prefers-reduced-motion: no-preference) {
   .hero-line {
-    animation: hero-rise 1.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: hero-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 }
 
 @keyframes hero-rise {
   from {
     opacity: 0.001;
-    transform: translateY(2rem);
+    transform: translateY(1.5rem);
   }
   to {
     opacity: 1;
     transform: none;
   }
+}
+
+/* A block still waiting to reveal shows at once when it takes keyboard focus. */
+[data-reveal]:focus-within,
+[data-reveal]:focus-within > *,
+[data-pin-part]:focus-within {
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -347,10 +412,18 @@ p {
 .site-header {
   position: fixed;
   inset: 0 0 auto 0;
-  z-index: 10;
+  z-index: var(--z-header);
+  height: var(--header-h);
   background: var(--paper);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.4s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Very short screens (landscape phones, 400% zoom): the header scrolls away. */
+@media (max-height: 30em) {
+  .site-header {
+    position: absolute;
+  }
 }
 
 .site-header.is-scrolled {
@@ -362,7 +435,7 @@ p {
   justify-content: space-between;
   align-items: center;
   gap: var(--space-5);
-  min-height: 4.5rem;
+  height: 100%;
 }
 
 .wordmark {
@@ -393,12 +466,12 @@ p {
   gap: var(--space-6);
 }
 
-/* Phones keep only Contact in the bar. The chapters are one scroll away. */
+/* Phones keep only Contact in the bar; the email bar at the bottom does the rest. */
 .site-nav-chapter {
   display: none;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1000px) {
   .site-nav-chapter {
     display: list-item;
   }
@@ -411,30 +484,67 @@ p {
   font-size: var(--text-small);
   color: var(--muted);
   text-decoration: none;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.45em;
   transition: color 0.3s ease;
 }
 
-.header-link:hover {
+.header-link:hover,
+.header-link[aria-current] {
   color: var(--ink);
 }
 
+.header-link[aria-current] {
+  text-decoration-line: underline;
+}
+
 .header-link--contact {
-  color: var(--ink);
   padding-inline: var(--space-5);
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.header-link--contact {
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-pill);
   background: var(--ink);
-  border-color: var(--ink);
   color: var(--paper);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .header-link--contact:hover {
   background: var(--paper);
   color: var(--ink);
+}
+
+/* The ring sits clear of the Ink pill, so the gap shows it is a ring and not the pill's edge. */
+.header-link--contact:focus-visible {
+  outline-offset: 4px;
+}
+
+/* Over the dark chapters the bar turns Ink too. */
+.site-header.is-dark {
+  background: var(--ink);
+  border-bottom-color: var(--line-dark);
+}
+
+.site-header.is-dark .header-link {
+  color: var(--paper-muted);
+}
+
+.site-header.is-dark .header-link:hover,
+.site-header.is-dark .header-link[aria-current] {
+  color: var(--paper);
+}
+
+.site-header.is-dark .header-link--contact {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+}
+
+.site-header.is-dark .header-link--contact:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.site-header.is-dark :focus-visible {
+  outline-color: var(--paper);
 }
 
 .skip-link {
@@ -445,16 +555,48 @@ p {
   background: var(--ink);
   color: var(--paper);
   text-decoration: none;
-  z-index: 20;
+  z-index: var(--z-skip);
 }
 
 .skip-link:focus {
   top: var(--space-3);
 }
 
-/* Fixed header: in-page targets land below it. */
-html {
-  scroll-padding-top: 4.5rem;
+/* --- Mobile email bar ----------------------------------------------------- */
+
+.mobile-cta {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: var(--z-cta);
+  padding: var(--space-2) var(--gutter) calc(var(--space-2) + env(safe-area-inset-bottom));
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+  transform: translateY(110%);
+  visibility: hidden;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.4s;
+}
+
+.mobile-cta.is-shown {
+  transform: none;
+  visibility: visible;
+}
+
+.mobile-cta-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-h);
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+@media (min-width: 900px) {
+  .mobile-cta {
+    display: none;
+  }
 }
 
 /* --- Hero ----------------------------------------------------------------- */
@@ -470,8 +612,8 @@ html {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--space-8);
-  padding-block: calc(4.5rem + var(--space-8)) var(--space-6);
+  gap: var(--space-7);
+  padding-block: calc(var(--header-h) + var(--space-8)) var(--space-6);
 }
 
 .hero-title {
@@ -488,18 +630,14 @@ html {
   color: var(--brand);
 }
 
+/* Indent the second line by two of the twelve columns. */
 @media (min-width: 900px) {
   .hero-line--2 {
-    margin-left: 16.666%;
+    margin-left: calc((100% - 11 * var(--column-gap)) / 12 * 2 + 2 * var(--column-gap));
   }
 }
 
 .hero-foot {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: var(--space-6);
   padding-top: var(--space-5);
   border-top: 1px solid var(--line-strong);
 }
@@ -509,45 +647,35 @@ html {
   color: var(--ink);
 }
 
-.hero-scroll {
-  display: none;
-  align-items: center;
-  gap: var(--space-3);
-  font-size: var(--text-small);
-  color: var(--muted);
-}
-
-.hero-scroll-line {
-  display: block;
-  width: 1px;
-  height: 3rem;
-  background: var(--line-strong);
-}
-
-@media (min-width: 900px) {
-  .hero-scroll {
-    display: inline-flex;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .hero-scroll-line {
-    animation: scroll-cue 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-  }
-}
-
-@keyframes scroll-cue {
-  0% { transform: scaleY(0); transform-origin: top; }
-  45% { transform: scaleY(1); transform-origin: top; }
-  55% { transform: scaleY(1); transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; }
-}
-
 /* --- Showcase: MonoBook's own identity ------------------------------------ */
 
 .showcase {
   background: var(--paper);
   padding-block: 0 var(--space-section);
+}
+
+.showcase-text {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+
+@media (min-width: 900px) {
+  .showcase-text {
+    grid-template-columns: 1fr 2fr;
+    column-gap: var(--column-gap);
+  }
+}
+
+.showcase-label {
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.showcase-caption {
+  max-width: 44ch;
+  color: var(--ink);
 }
 
 .showcase-grid {
@@ -578,38 +706,12 @@ html {
   }
   .showcase-item--1 {
     grid-row: 1 / span 2;
+    display: grid;
+    grid-template-rows: 1fr auto;
   }
   .showcase-item--1 img {
     height: 100%;
     aspect-ratio: auto;
-  }
-  .showcase-item--1 {
-    display: grid;
-    grid-template-rows: 1fr auto;
-  }
-}
-
-.showcase-text {
-  display: grid;
-  gap: var(--space-4);
-  margin-top: var(--space-8);
-}
-
-.showcase-label {
-  font-size: var(--text-small);
-  font-weight: 500;
-  letter-spacing: 0;
-  color: var(--ink);
-}
-
-.showcase-caption {
-  max-width: 44ch;
-}
-
-@media (min-width: 900px) {
-  .showcase-text {
-    grid-template-columns: 1fr 2fr;
-    column-gap: var(--column-gap);
   }
 }
 
@@ -619,6 +721,7 @@ html {
   max-width: 22ch;
 }
 
+/* Without motion: the two old marks, then the one new mark, side by side. */
 .problem-marks {
   display: flex;
   flex-wrap: wrap;
@@ -652,10 +755,6 @@ html {
   stroke-width: 1.5;
 }
 
-.problem-mark--merged {
-  fill: var(--brand);
-}
-
 .problem-caption {
   position: absolute;
   top: calc(100% + var(--space-3));
@@ -664,40 +763,40 @@ html {
   color: var(--muted);
 }
 
-/* With motion, the three marks share one spot: two slide in and become one. */
-.problem-marks--animated {
-  display: grid;
-  justify-content: center;
-  place-items: center;
+/* With motion: all three marks share one spot, so two slide in and become one.
+   Set from CSS rather than script, so the layout never jumps once GSAP loads. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  .problem-marks {
+    display: grid;
+    justify-content: center;
+    place-items: center;
+  }
+  .problem-pair,
+  .problem-one {
+    grid-area: 1 / 1;
+    grid-auto-flow: row;
+  }
+  .problem-mark {
+    grid-area: 1 / 1;
+  }
+  .problem-caption {
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
 }
 
-.problem-marks--animated .problem-pair,
-.problem-marks--animated .problem-one {
-  grid-area: 1 / 1;
-  display: grid;
-  grid-auto-flow: row;
-}
-
-.problem-marks--animated .problem-mark {
-  grid-area: 1 / 1;
-}
-
-.problem-marks--animated .problem-caption {
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
+/* On wide screens the marks line up with the text column instead. */
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) and (min-width: 900px) {
+  .problem-marks {
+    justify-content: start;
+    padding-left: var(--space-10);
+  }
 }
 
 .problem-follow {
   margin-top: var(--space-9);
   color: var(--ink);
-}
-
-@media (min-width: 900px) {
-  .problem-marks--animated {
-    justify-content: start;
-    padding-left: 25%;
-  }
 }
 
 /* --- Deliverables --------------------------------------------------------- */
@@ -741,28 +840,21 @@ html {
 }
 
 @media (min-width: 900px) {
-  .deliverable {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
   .deliverable-inner {
     align-items: center;
   }
   .deliverable-demo {
     margin-top: 0;
-    grid-column: 7 / span 6;
   }
 }
 
-/* On phones the count sits beside the number; the fixed line is desktop only. */
-.deliverable-of {
-  margin-left: var(--space-4);
-}
-
-@media (min-width: 900px) {
-  .deliverable-of {
-    display: none;
+/* Same media as the pin (components/motion/loadMotion.ts): one panel per screen. */
+@media (min-width: 900px) and (min-height: 760px) {
+  .deliverable {
+    min-height: 80vh;
+    min-height: calc(100svh - var(--header-h));
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -772,7 +864,7 @@ html {
   position: fixed;
   left: var(--gutter);
   bottom: var(--space-5);
-  z-index: 5;
+  z-index: var(--z-progress);
   align-items: center;
   gap: var(--space-3);
   font-size: var(--text-small);
@@ -809,10 +901,9 @@ html {
   inset: 0;
   background: var(--brand);
   transform-origin: left center;
-  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* --- Demos (placeholders, greys and Ink only) ----------------------------- */
+/* --- Demos: MonoBook's own identity, applied ------------------------------ */
 
 .demo {
   width: 100%;
@@ -822,14 +913,6 @@ html {
   margin-top: var(--space-3);
   font-size: var(--text-small);
   color: var(--muted);
-}
-
-.mark-fill {
-  fill: var(--ink);
-}
-
-.mark-soft {
-  fill: var(--placeholder-2);
 }
 
 /* Logo */
@@ -843,7 +926,8 @@ html {
   max-width: 30rem;
 }
 
-.van-body {
+.van-body,
+.van-wheel {
   fill: var(--paper);
   stroke: var(--ink);
   stroke-width: 2;
@@ -855,10 +939,8 @@ html {
   stroke-width: 1.5;
 }
 
-.van-wheel {
-  fill: var(--paper);
-  stroke: var(--ink);
-  stroke-width: 2;
+.van-wordmark {
+  fill: var(--ink);
 }
 
 .card {
@@ -875,16 +957,19 @@ html {
 }
 
 .card-mark {
-  width: 2.5rem;
+  width: 2.75rem;
   align-self: flex-start;
+  border-radius: var(--radius-sm);
 }
 
 .card-text {
   display: grid;
   gap: var(--space-1);
+  min-width: 0;
   text-align: right;
   font-size: var(--text-small);
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .card-text span + span {
@@ -896,10 +981,6 @@ html {
     grid-template-columns: minmax(0, 1fr) 15rem;
     align-items: end;
   }
-}
-
-.card-text span {
-  white-space: nowrap;
 }
 
 /* Colour */
@@ -925,20 +1006,22 @@ html {
   margin-bottom: var(--space-2);
 }
 
-.swatch--1 { background: var(--ink); }
-.swatch--2 { background: var(--placeholder-2); }
-.swatch--3 { background: var(--stone); }
-.swatch--4 { background: var(--paper); }
+.swatch--orange { background: var(--brand); }
+.swatch--black { background: var(--ink); }
+.swatch--white { background: var(--paper); }
+.swatch--grey { background: var(--grey); }
 
 .swatch-name {
   font-weight: 500;
 }
 
 .swatch-row {
-  display: grid;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
   color: var(--muted);
+  font-variant-numeric: tabular-nums;
   line-height: 1.35;
-  margin-top: var(--space-2);
 }
 
 .swatch-row span:first-child {
@@ -948,6 +1031,10 @@ html {
 @media (min-width: 1200px) {
   .swatches {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .swatch-row {
+    display: grid;
+    justify-content: start;
   }
 }
 
@@ -971,6 +1058,7 @@ html {
 }
 
 .type-heading {
+  font-family: var(--font-display);
   font-size: var(--text-h3);
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -1000,13 +1088,12 @@ html {
 }
 
 .photo-frame {
-  display: grid;
-  place-items: center;
+  width: 100%;
+  height: auto;
   aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
   background: var(--placeholder);
-  border-radius: 2px;
-  font-size: var(--text-small);
-  color: var(--ink);
 }
 
 .photo-rules {
@@ -1036,14 +1123,16 @@ html {
   padding: var(--space-5);
   background: var(--paper);
   border: 1px solid var(--line-strong);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .doc-mark {
-  width: 2.25rem;
+  width: 2.5rem;
+  border-radius: var(--radius-sm);
 }
 
 .doc-title {
+  font-family: var(--font-display);
   font-size: var(--text-lead);
   font-weight: 500;
   line-height: 1.15;
@@ -1117,20 +1206,12 @@ html {
 }
 
 .pace-option--sprint .body,
-.pace-option--sprint .pace-step,
 .pace-option--sprint .pace-length {
   color: var(--paper-muted);
 }
 
-.pace-step {
-  font-size: var(--text-small);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .pace-name {
   font-size: var(--text-h3);
-  margin-top: var(--space-8);
 }
 
 .pace-length {
@@ -1147,12 +1228,13 @@ html {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .pace-option {
-    min-height: 24rem;
+    min-height: 20rem;
     padding: var(--space-7);
   }
 }
 
-/* Sprint day: four steps on one line */
+/* Sprint day: one line through four steps. The line is drawn by
+   SprintSteps.tsx through --sprint-line; without motion it is simply there. */
 .sprint {
   margin-top: var(--space-10);
 }
@@ -1164,6 +1246,7 @@ html {
 }
 
 .sprint-steps {
+  position: relative;
   list-style: none;
   padding: 0;
   display: grid;
@@ -1172,29 +1255,32 @@ html {
   margin-top: var(--space-7);
 }
 
+.sprint-steps::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 1px;
+  background: var(--line-strong);
+  transform: scaleY(var(--sprint-line, 1));
+  transform-origin: top;
+}
+
 .sprint-step {
   position: relative;
   display: grid;
   align-content: start;
   gap: var(--space-2);
   padding-left: var(--space-6);
-  border-left: 1px solid var(--line-strong);
 }
 
 .sprint-dot {
   position: absolute;
-  left: -5px;
+  left: -4px;
   top: 0.45em;
   width: 9px;
   height: 9px;
   border-radius: 50%;
   background: var(--ink);
-}
-
-.sprint-num {
-  font-size: var(--text-small);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
 }
 
 .sprint-when {
@@ -1205,14 +1291,19 @@ html {
   .sprint-steps {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+  .sprint-steps::before {
+    inset: 0 0 auto 0;
+    width: auto;
+    height: 1px;
+    transform: scaleX(var(--sprint-line, 1));
+    transform-origin: left;
+  }
   .sprint-step {
     padding: var(--space-6) var(--space-4) 0 0;
-    border-left: 0;
-    border-top: 1px solid var(--line-strong);
   }
   .sprint-dot {
     left: 0;
-    top: -5px;
+    top: -4px;
   }
 }
 
@@ -1262,54 +1353,12 @@ html {
 @media (min-width: 900px) {
   .needs-head {
     position: sticky;
-    top: calc(4.5rem + var(--space-7));
+    top: calc(var(--header-h) + var(--space-7));
     align-self: start;
   }
 }
 
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 3.5rem;
-  padding: var(--space-4) var(--space-6);
-  border-radius: 999px;
-  font-size: var(--text-body);
-  font-weight: 500;
-  text-decoration: none;
-  overflow-wrap: anywhere;
-  text-align: center;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.button-outline {
-  border: 1px solid var(--ink);
-  color: var(--ink);
-}
-
-.button-outline:hover {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-@media (max-width: 767.98px) {
-  .button {
-    display: flex;
-    width: 100%;
-  }
-}
-
 /* --- Proof (dark chapter) ------------------------------------------------- */
-
-.proof-intro {
-  max-width: 40ch;
-}
-
-.proof-case {
-  margin-top: var(--space-10);
-  padding-top: var(--space-7);
-  border-top: 1px solid var(--line-dark);
-}
 
 .proof-company {
   font-size: var(--text-display);
@@ -1319,8 +1368,18 @@ html {
   max-width: 12ch;
 }
 
-.proof-body {
+.proof-intro {
+  margin-top: var(--space-7);
+  max-width: 40ch;
+}
+
+.proof-case {
   margin-top: var(--space-9);
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--line-dark);
+}
+
+.proof-body {
   row-gap: var(--space-8);
 }
 
@@ -1355,6 +1414,7 @@ html {
 }
 
 .proof-did-text {
+  font-family: var(--font-display);
   font-size: var(--text-lead);
   line-height: 1.4;
   max-width: 34ch;
@@ -1407,11 +1467,18 @@ html {
 }
 
 .proof-quote blockquote p {
+  font-family: var(--font-display);
   font-size: var(--text-h2);
   line-height: 1.12;
   letter-spacing: -0.03em;
   font-weight: 500;
-  text-indent: -0.4em;
+}
+
+/* Hang the opening quote mark into the margin, but only where there is a margin. */
+@media (min-width: 768px) {
+  .proof-quote blockquote p {
+    text-indent: -0.4em;
+  }
 }
 
 .proof-quote figcaption {
@@ -1427,6 +1494,7 @@ html {
 
 .contact-heading {
   max-width: 18ch;
+  color: var(--paper);
 }
 
 .contact-action {
@@ -1435,7 +1503,6 @@ html {
 
 .contact-email {
   display: inline-flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4) var(--space-6);
   min-height: var(--tap);
@@ -1444,21 +1511,18 @@ html {
   text-decoration: none;
 }
 
-.contact-heading {
-  color: var(--paper);
-}
-
 .contact-email-text {
+  min-width: 0;
   font-family: var(--font-display);
   font-size: var(--text-email);
   font-weight: 500;
   letter-spacing: -0.04em;
   line-height: 1.05;
   color: var(--paper);
-  overflow-wrap: anywhere;
+  white-space: nowrap;
   text-decoration: underline;
   text-decoration-thickness: 2px;
-  text-decoration-color: rgba(251, 251, 251, 0.45);
+  text-decoration-color: var(--paper-underline);
   text-underline-offset: 0.14em;
   transition: text-decoration-color 0.3s ease;
 }
@@ -1467,12 +1531,23 @@ html {
   text-decoration-color: var(--paper);
 }
 
+/* Under 375px the address drops below 24px, where White on orange is too faint (3.9:1). */
+@media (max-width: 374.98px) {
+  .contact-email-text {
+    color: var(--ink);
+    text-decoration-color: var(--line-strong);
+  }
+  .contact-email:hover .contact-email-text {
+    text-decoration-color: var(--ink);
+  }
+}
+
 /* The round arrow beside the email: Black on the orange chapter. */
 .contact-arrow {
   display: inline-grid;
   place-items: center;
   flex: none;
-  width: clamp(3.5rem, 2.5rem + 3vw, 6rem);
+  width: clamp(2.25rem, 1.25rem + 3.6vw, 6rem);
   aspect-ratio: 1;
   border-radius: 50%;
   background: var(--ink);
@@ -1491,9 +1566,35 @@ html {
   transform: rotate(45deg);
 }
 
-.contact-note {
+.contact-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
   margin-top: var(--space-7);
+}
+
+.contact-note {
   color: var(--ink);
+}
+
+.copy-email {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  padding-inline: var(--space-5);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius-pill);
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.copy-email:hover {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 /* --- Footer --------------------------------------------------------------- */
@@ -1509,7 +1610,8 @@ html {
   row-gap: var(--space-7);
 }
 
-.footer-col {
+.footer-col,
+.footer-address {
   display: grid;
   align-content: start;
   gap: var(--space-1);
@@ -1527,10 +1629,16 @@ html {
   margin-bottom: var(--space-3);
 }
 
+.footer-hours {
+  margin-top: var(--space-3);
+  color: var(--paper-muted);
+}
+
 .footer-link {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
+  min-width: var(--tap);
   color: var(--paper);
   text-decoration: none;
 }
@@ -1572,7 +1680,102 @@ html {
   height: auto;
 }
 
-/* Sections that receive focus from in-page links do not need a ring. */
-[tabindex="-1"]:focus {
-  outline: none;
+/* --- Not found ------------------------------------------------------------ */
+
+.not-found {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+}
+
+.not-found-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-9);
+  padding-block: var(--space-6) var(--space-9);
+}
+
+.not-found-body {
+  margin-top: var(--space-5);
+}
+
+.not-found-link {
+  margin-top: var(--space-7);
+}
+
+/* --- Windows High Contrast ------------------------------------------------ */
+
+@media (forced-colors: active) {
+  .progress-fill,
+  .sprint-dot,
+  .sprint-steps::before {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+  .swatch-chip,
+  .logo-tile-bg,
+  .logo-tile-mark {
+    forced-color-adjust: none;
+  }
+  .button,
+  .header-link--contact,
+  .mobile-cta-link,
+  .copy-email {
+    border: 1px solid ButtonText;
+  }
+}
+
+/* --- Print ---------------------------------------------------------------- */
+
+@media print {
+  .site-header,
+  .progress,
+  .mobile-cta,
+  .skip-link,
+  .copy-email {
+    display: none !important;
+  }
+  /* Anything waiting to reveal, or pinned, prints in its final place. */
+  [style*="opacity"],
+  [style*="transform"],
+  [data-reveal],
+  [data-pin-part] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hero,
+  .deliverable,
+  .not-found {
+    min-height: auto;
+  }
+  .section--ink,
+  .section--brand,
+  .site-footer,
+  .pace-option--sprint {
+    background: none;
+    color: var(--ink);
+  }
+  .section--ink .label,
+  .section--ink .lead,
+  .proof-facts dt,
+  .proof-did-label,
+  .proof-frame-placeholder,
+  .proof-quote figcaption,
+  .pace-option--sprint .body,
+  .pace-option--sprint .pace-length,
+  .footer-label,
+  .footer-hours,
+  .footer-link,
+  .footer-wordmark,
+  .contact-heading,
+  .contact-email-text {
+    color: var(--ink);
+  }
+  .proof-case,
+  .proof-facts,
+  .proof-facts div,
+  .proof-frame {
+    border-color: var(--line-strong);
+  }
 }

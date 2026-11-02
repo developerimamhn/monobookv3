@@ -2,11 +2,12 @@ import { Reveal } from "@/components/motion/Reveal";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
 import { pace } from "@/content/copy";
+import { SprintSteps } from "./SprintSteps";
 
-/** Same five parts, three speeds, then how the one-day sprint runs. No prices. */
+/** Same five parts, three speeds, then how the one-day sprint runs. */
 export function Pace() {
   return (
-    <Section id="pace" tone="stone" labelledBy="pace-title" className="pace">
+    <Section id="pace" tone="stone" labelledBy="pace-title">
       <Reveal className="grid pace-head">
         <div className="col-12">
           <Label index={pace.index}>{pace.label}</Label>
@@ -20,9 +21,6 @@ export function Pace() {
       <Reveal as="ol" className="pace-options" stagger>
         {pace.options.map((option, i) => (
           <li key={option.name} className={`pace-option${i === 0 ? " pace-option--sprint" : ""}`}>
-            <span className="pace-step" aria-hidden="true">
-              {String(i + 1).padStart(2, "0")}
-            </span>
             <h3 className="pace-name">{option.name}</h3>
             <p className="pace-length">{option.length}</p>
             <p className="body">{option.body}</p>
@@ -30,21 +28,10 @@ export function Pace() {
         ))}
       </Reveal>
 
-      <Reveal className="sprint">
+      <div className="sprint">
         <h3 className="sprint-heading">{pace.sprint.heading}</h3>
-        <ol className="sprint-steps">
-          {pace.sprint.steps.map((step, i) => (
-            <li key={step.when} className="sprint-step">
-              <span className="sprint-dot" aria-hidden="true" />
-              <span className="sprint-num" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <p className="sprint-when">{step.when}</p>
-              <p className="body">{step.body}</p>
-            </li>
-          ))}
-        </ol>
-      </Reveal>
+        <SprintSteps />
+      </div>
 
       <Reveal>
         <p className="h3 pace-identical">{pace.identical}</p>
