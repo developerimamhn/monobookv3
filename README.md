@@ -28,6 +28,7 @@ npm start       # serve out/ on http://127.0.0.1:3000
 
 Upload `out/` to any static host. Build command `npm run build`, output directory `out`.
 
+- **cPanel or any Apache/LiteSpeed hosting** reads `public/.htaccess`; step-by-step upload and SEO launch guide in [`docs/DEPLOY.md`](docs/DEPLOY.md).
 - **Vercel** reads `vercel.json`; **Netlify** and **Cloudflare Pages** read `public/_headers` and `public/_redirects`. Both set the security headers (CSP, HSTS, nosniff, referrer and permissions policy), send `www` to the bare domain, and keep Next's `.txt` data files out of search.
 - Make sure the host serves `404.html` with a 404 status. Netlify and Cloudflare Pages do this on their own.
 - On another host, copy those headers and the redirect into its config.
