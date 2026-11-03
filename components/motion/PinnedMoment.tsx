@@ -13,32 +13,35 @@ type PinnedMomentProps = {
 };
 
 /*
- * One idea per screen. On screens with room for it the panel pins briefly
- * while its [data-pin-part] children rise in, then the Mk. tile ([data-stamp])
- * lands on the demo. Elsewhere the parts simply reveal once.
+ * One idea per screen, played by the scroll like a short film: the panel's
+ * [data-pin-part] children rise, its demo builds piece by piece
+ * ([data-demo-step]), then the Mk. tile lands ([data-stamp]). On screens with
+ * room for it the panel pins while that plays; elsewhere it plays in place.
  */
-export function PinnedMoment({ children, className, labelledBy, hold = 0.3 }: PinnedMomentProps) {
+export function PinnedMoment({ children, className, labelledBy, hold = 0.35 }: PinnedMomentProps) {
   const ref = useRef<HTMLElement>(null);
 
   useScrollMotion(ref, ({ gsap, ScrollTrigger }, el) => {
     const parts = el.querySelectorAll("[data-pin-part]");
     const steps = el.querySelectorAll("[data-demo-step]");
     const stamps = el.querySelectorAll("[data-stamp]");
-    const step = { opacity: 0, y: 16, duration: 0.5, ease: "power2.out", stagger: 0.08 };
-    const stamp = { scale: 1.12, opacity: 0, duration: 0.45, ease: "power4.out", transformOrigin: "50% 50%" };
+
+    // The storyboard, in timeline units: 0 to 1 is the whole scroll range it is given.
+    const storyboard = (tl: GSAPTimeline) =>
+      tl
+        .from(parts, { opacity: 0, y: motion.rise, ease: "power2.out", duration: 0.35, stagger: 0.06 }, 0)
+        .from(steps, { opacity: 0, y: 20, ease: "power2.out", duration: 0.25, stagger: 0.05 }, 0.3)
+        .from(stamps, { opacity: 0, scale: 1.15, ease: "power3.out", duration: 0.15, transformOrigin: "50% 50%" }, 0.78);
+
     const mm = gsap.matchMedia();
 
     mm.add(queries.pin, () => {
-      gsap.from(parts, {
-        opacity: 0,
-        y: motion.rise,
-        ease: "power2.out",
-        stagger: 0.12,
-        scrollTrigger: { trigger: el, start: "top 85%", end: "top 35%", scrub: 0.6 },
-      });
-      // While the panel settles, its demo builds piece by piece and the Mk. tile lands.
-      gsap.from(steps, { ...step, scrollTrigger: { trigger: el, start: "top 45%", toggleActions: "play none none reverse" } });
-      gsap.from(stamps, { ...stamp, scrollTrigger: { trigger: el, start: "top 30%", toggleActions: "play none none reverse" } });
+      // From the panel entering low on the screen until its pin ends.
+      storyboard(
+        gsap.timeline({
+          scrollTrigger: { trigger: el, start: "top 85%", end: () => `+=${Math.round(window.innerHeight * (0.85 + hold))}`, scrub: motion.scrub },
+        }),
+      );
       ScrollTrigger.create({
         trigger: el,
         start: "top top",
@@ -51,17 +54,14 @@ export function PinnedMoment({ children, className, labelledBy, hold = 0.3 }: Pi
       // dims as it leaves, overlapping the next one rising in, so there is no blank band.
       // Once it is fully off screen it returns to full strength, so nothing stays faded.
       gsap
-        .timeline({ scrollTrigger: { trigger: el, start: "bottom 75%", end: "bottom top", scrub: 0.6 } })
-        .to(el.firstElementChild, { opacity: 0.15, y: -24, ease: "none", duration: 0.8 })
+        .timeline({ scrollTrigger: { trigger: el, start: "bottom 75%", end: "bottom top", scrub: motion.scrub } })
+        .to(el.firstElementChild, { opacity: 0.15, y: -32, ease: "none", duration: 0.8 })
         .set(el.firstElementChild, { opacity: 1, y: 0 }, 1);
     });
 
     mm.add(queries.noPin, () => {
       if (ScrollTrigger.isInViewport(el, 0.1) || el.getBoundingClientRect().bottom < 0) return;
-      const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 80%", once: true } });
-      tl.from(parts, { opacity: 0, y: motion.rise, duration: motion.duration, ease: motion.ease, stagger: 0.12 });
-      tl.from(steps, step, "-=0.4");
-      tl.from(stamps, stamp, "-=0.3");
+      storyboard(gsap.timeline({ scrollTrigger: { trigger: el, start: "top 90%", end: "center 45%", scrub: motion.scrub } }));
     });
   });
 

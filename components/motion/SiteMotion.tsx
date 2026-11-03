@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { loadMotion, loadSplitText, queueRefresh } from "./loadMotion";
+import { loadMotion, loadSplitText, motion, queueRefresh } from "./loadMotion";
 import { useMotion } from "./MotionProvider";
 
 const inView = (el: Element) => {
@@ -16,9 +16,10 @@ const passed = (el: Element) => el.getBoundingClientRect().bottom < 0;
  * - the hero headline drifts slower than the page; showcase photos settle from a zoom
  * - Eric Dahl's quote brightens word by word
  * - chapter headings rise line by line from behind a mask
- * - the orange Contact chapter opens out from a rounded inset as it arrives
+ * - the Proof and Contact chapters open out from a rounded inset as they arrive
  * - the Mayfair "After" frame wipes in over "Before"
  * - the footer wordmark rises and the Mk. tile lands one last time
+ * All of them follow the scroll (scrubbed), so the page plays like footage you scroll through.
  */
 export function SiteMotion() {
   const { reduced } = useMotion();
@@ -39,22 +40,33 @@ export function SiteMotion() {
       // Created empty first: callbacks below call ctx.add, some of them straight away.
       const ctx = gsap.context(() => {});
       ctx.add(() => {
-        // The headline drifts up a little slower than the page as you scroll away from it.
+        // As you scroll away, the headline drifts up slower than the page and its two lines
+        // part (--hero-drift, see .hero-line in CSS), which gives the opening shot some depth.
         // Set up on the first scroll, so nothing touches the headline while the page loads.
         const heroTitle = document.querySelector(".hero-title");
         if (heroTitle && window.scrollY < window.innerHeight) {
           const startParallax = () =>
             ctx.add(() => {
-              gsap.to(heroTitle, { yPercent: -12, ease: "none", scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
+              gsap.to(heroTitle, {
+                yPercent: -10,
+                "--hero-drift": 1,
+                ease: "none",
+                scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: motion.scrub },
+              });
             });
           window.addEventListener("scroll", startParallax, { once: true, passive: true });
           ctx.add(() => () => window.removeEventListener("scroll", startParallax));
         }
 
-        // Each showcase photo settles from a slight zoom inside its frame.
+        // Each showcase photo settles from a slight zoom inside its frame, and the two small
+        // ones travel a little against the large one, like layers in a camera move.
         for (const img of document.querySelectorAll(".showcase-media img")) {
           if (passed(img)) continue;
-          gsap.fromTo(img, { scale: 1.12 }, { scale: 1, ease: "none", scrollTrigger: { trigger: img, start: "top bottom", end: "bottom 60%", scrub: true } });
+          gsap.fromTo(img, { scale: 1.15 }, { scale: 1, ease: "none", scrollTrigger: { trigger: img, start: "top bottom", end: "bottom 55%", scrub: motion.scrub } });
+        }
+        for (const media of document.querySelectorAll(".showcase-item--2 .showcase-media, .showcase-item--3 .showcase-media")) {
+          if (passed(media)) continue;
+          gsap.fromTo(media, { y: 28 }, { y: -28, ease: "none", scrollTrigger: { trigger: ".showcase-grid", start: "top bottom", end: "bottom top", scrub: motion.scrub } });
         }
 
         // Eric Dahl's words brighten one by one. They start at Paper 70%, which already passes AA on Ink.
@@ -67,7 +79,7 @@ export function SiteMotion() {
             gsap.fromTo(
               words,
               { color: root.getPropertyValue("--paper-muted").trim() },
-              { color: root.getPropertyValue("--paper").trim(), ease: "none", stagger: 0.1, scrollTrigger: { trigger: quote, start: "top 75%", end: "bottom 50%", scrub: 1 } },
+              { color: root.getPropertyValue("--paper").trim(), ease: "none", stagger: 0.1, scrollTrigger: { trigger: quote, start: "top 75%", end: "bottom 50%", scrub: motion.scrub } },
             );
           });
         }
@@ -103,12 +115,15 @@ export function SiteMotion() {
           });
         }
 
-        const contact = document.getElementById("contact");
-        if (contact && !passed(contact)) {
+        // The two full-colour chapters, Proof in black and Contact in orange, open out from a
+        // rounded inset as they arrive, like a cut to the next scene.
+        for (const id of ["proof", "contact"]) {
+          const chapter = document.getElementById(id);
+          if (!chapter || passed(chapter)) continue;
           gsap.fromTo(
-            contact,
-            { clipPath: "inset(5% 3% 0% 3% round 32px)" },
-            { clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none", scrollTrigger: { trigger: contact, start: "top bottom", end: "top 30%", scrub: 0.6 } },
+            chapter,
+            { clipPath: "inset(4% 3% 0% 3% round 32px)" },
+            { clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none", scrollTrigger: { trigger: chapter, start: "top bottom", end: "top 25%", scrub: motion.scrub } },
           );
         }
 
@@ -117,20 +132,21 @@ export function SiteMotion() {
           gsap.fromTo(
             after,
             { clipPath: "inset(0% 100% 0% 0%)" },
-            { clipPath: "inset(0% 0% 0% 0%)", duration: 1, ease: "expo.inOut", scrollTrigger: { trigger: after, start: "top 70%", once: true } },
+            { clipPath: "inset(0% 0% 0% 0%)", ease: "power1.inOut", scrollTrigger: { trigger: after, start: "top 85%", end: "top 35%", scrub: motion.scrub } },
           );
         }
 
+        // The closing shot: the wordmark rises into place as the page reaches its end, then the Mk. tile lands.
         const brand = document.querySelector(".footer-brand");
         if (brand && !inView(brand)) {
           gsap
-            .timeline({ scrollTrigger: { trigger: brand, start: "top 95%", once: true } })
+            .timeline({ scrollTrigger: { trigger: brand, start: "top bottom", end: "bottom bottom", scrub: motion.scrub } })
             .fromTo(
               brand.querySelector(".footer-wordmark"),
-              { yPercent: 40, clipPath: "inset(0% 0% 100% 0%)" },
-              { yPercent: 0, clipPath: "inset(0% 0% 0% 0%)", duration: 1, ease: "expo.out" },
+              { yPercent: 60, clipPath: "inset(0% 0% 100% 0%)" },
+              { yPercent: 0, clipPath: "inset(0% 0% 0% 0%)", duration: 0.75, ease: "power2.out" },
             )
-            .from(brand.querySelector(".footer-tile"), { scale: 1.12, opacity: 0, duration: 0.45, ease: "power4.out" }, "-=0.35");
+            .from(brand.querySelector(".footer-tile"), { scale: 1.15, opacity: 0, duration: 0.25, ease: "power3.out" }, 0.75);
         }
       });
       revert = () => ctx.revert();

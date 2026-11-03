@@ -2,10 +2,12 @@
  * Pins add height to the page after the browser has already scrolled. Left
  * alone, a deep link (/#contact), a reload half way down, or a resize across
  * the pin breakpoint all land somewhere else. The keeper remembers which block
- * sits under the header and puts it back there after every ScrollTrigger refresh.
+ * sits under the header, and how far through it you are, and puts you back
+ * there after every ScrollTrigger refresh. "How far" is a share of the block's
+ * height, not pixels, because a pinned block is taller than the same block unpinned.
  */
 
-type Spot = { el: HTMLElement; offset: number };
+type Spot = { el: HTMLElement; progress: number };
 
 const ANCHORS = "main > section, .deliverable, .site-footer";
 const STORE = "monobook:scroll";
@@ -20,11 +22,11 @@ const box = (el: HTMLElement) => (el.parentElement?.classList.contains("pin-spac
 const anchors = () => Array.from(document.querySelectorAll<HTMLElement>(ANCHORS));
 
 function spotUnderHeader(): Spot | null {
-  const line = headerHeight() + 1;
+  const line = headerHeight();
   let spot: Spot | null = null;
   for (const el of anchors()) {
-    const top = box(el).getBoundingClientRect().top;
-    if (top <= line) spot = { el, offset: top };
+    const r = box(el).getBoundingClientRect();
+    if (r.top <= line + 1) spot = { el, progress: Math.max(0, line - r.top) / Math.max(1, r.height) };
   }
   return spot;
 }
@@ -33,16 +35,16 @@ function initialSpot(): Spot | null {
   const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
   if (nav?.type === "reload" || nav?.type === "back_forward") {
     try {
-      const saved = JSON.parse(sessionStorage.getItem(STORE) ?? "null") as { index: number; offset: number } | null;
+      const saved = JSON.parse(sessionStorage.getItem(STORE) ?? "null") as { index: number; progress: number } | null;
       const el = saved ? anchors()[saved.index] : undefined;
-      if (saved && el) return { el, offset: saved.offset };
+      if (saved && el && typeof saved.progress === "number") return { el, progress: saved.progress };
     } catch {
       // Storage can be blocked; the page then simply starts where the browser put it.
     }
   }
   const id = decodeURIComponent(location.hash.slice(1));
   const target = id ? document.getElementById(id) : null;
-  return target ? { el: target, offset: headerHeight() } : null;
+  return target ? { el: target, progress: 0 } : null;
 }
 
 export function createScrollKeeper(jump: (y: number) => void) {
@@ -76,7 +78,7 @@ export function createScrollKeeper(jump: (y: number) => void) {
   const onPageHide = () => {
     const current = spotUnderHeader();
     try {
-      if (current) sessionStorage.setItem(STORE, JSON.stringify({ index: anchors().indexOf(current.el), offset: current.offset }));
+      if (current) sessionStorage.setItem(STORE, JSON.stringify({ index: anchors().indexOf(current.el), progress: current.progress }));
       else sessionStorage.removeItem(STORE);
     } catch {
       // Nothing to restore next time, which is fine.
@@ -92,7 +94,8 @@ export function createScrollKeeper(jump: (y: number) => void) {
       clearTimeout(unpause);
       paused = false;
       if (!spot?.el.isConnected) return;
-      const y = window.scrollY + box(spot.el).getBoundingClientRect().top - spot.offset;
+      const r = box(spot.el).getBoundingClientRect();
+      const y = window.scrollY + r.top + spot.progress * r.height - headerHeight();
       if (Math.abs(y - window.scrollY) > 1) jump(Math.max(0, y));
     },
     destroy() {

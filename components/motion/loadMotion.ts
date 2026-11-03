@@ -21,8 +21,10 @@ export const queries = {
 export const motion = {
   ease: "power3.out",
   duration: 0.8,
-  rise: 32,
+  rise: 40,
   stagger: 0.08,
+  // Scroll-linked tweens trail the scroll by this many seconds, which smooths every jolt of the wheel.
+  scrub: 1,
 } as const;
 
 let idle: Promise<void> | null = null;

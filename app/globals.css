@@ -732,6 +732,16 @@ p {
   color: var(--brand);
 }
 
+/* Scrolling away, the two lines part: --hero-drift runs 0 to 1 (SiteMotion.tsx).
+   `translate` leaves `transform` to the load animation above. */
+.hero-line--1 {
+  translate: 0 calc(var(--hero-drift, 0) * -2.5rem);
+}
+
+.hero-title .hero-line--2 {
+  translate: 0 calc(var(--hero-drift, 0) * 1.5rem);
+}
+
 /* Indent the second line by two of the twelve columns. */
 @media (min-width: 900px) {
   .hero-line--2 {
@@ -1330,13 +1340,14 @@ p {
   border-radius: var(--radius);
 }
 
-/* A small lift under the pointer. Hover devices only, so a tap never leaves a card raised. */
+/* A small lift under the pointer. Hover devices only, so a tap never leaves a card raised.
+   It uses `translate`, not `transform`, which the scroll reveal owns. */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .pace-option {
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   }
   .pace-option:hover {
-    transform: translateY(-6px);
+    translate: 0 -6px;
   }
 }
 

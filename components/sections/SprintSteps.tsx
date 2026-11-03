@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import { motion } from "@/components/motion/loadMotion";
 import { useScrollMotion } from "@/components/motion/useScrollMotion";
 import { pace } from "@/content/copy";
 
@@ -14,11 +15,12 @@ export function SprintSteps() {
   useScrollMotion(ref, ({ gsap, ScrollTrigger }, el) => {
     if (ScrollTrigger.isInViewport(el, 0.2) || el.getBoundingClientRect().bottom < 0) return;
     const steps = el.querySelectorAll(".sprint-step");
+    // Drawn by the scroll: the line runs through the day and each step lands as the line reaches it.
     gsap
-      .timeline({ scrollTrigger: { trigger: el, start: "top 75%", once: true } })
-      .fromTo(el, { "--sprint-line": 0 }, { "--sprint-line": 1, duration: 0.9, ease: "power2.inOut" }, 0)
-      .from(el.querySelectorAll(".sprint-dot"), { scale: 0, duration: 0.3, ease: "power2.out", stagger: 0.18 }, 0.1)
-      .from(steps, { opacity: 0, y: 16, duration: 0.6, ease: "power3.out", stagger: 0.18 }, 0.15);
+      .timeline({ scrollTrigger: { trigger: el, start: "top 85%", end: "bottom 55%", scrub: motion.scrub } })
+      .fromTo(el, { "--sprint-line": 0 }, { "--sprint-line": 1, duration: 1, ease: "none" }, 0)
+      .from(el.querySelectorAll(".sprint-dot"), { scale: 0, duration: 0.12, ease: "power2.out", stagger: 0.25 }, 0.02)
+      .from(steps, { opacity: 0, y: 24, duration: 0.2, ease: "power2.out", stagger: 0.25 }, 0.04);
   });
 
   return (

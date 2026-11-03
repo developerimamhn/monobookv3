@@ -39,7 +39,7 @@ export function MotionProvider({ children }: { children: ReactNode }) {
 
     Promise.all([loadMotion(), touch ? null : loadLenis()]).then(([{ gsap, ScrollTrigger }, LenisClass]) => {
       if (cancelled) return;
-      const lenis = LenisClass ? new LenisClass({ lerp: 0.1, wheelMultiplier: 1 }) : null;
+      const lenis = LenisClass ? new LenisClass({ lerp: 0.085, wheelMultiplier: 1, smoothWheel: true }) : null;
       const onTick = (time: number) => lenis?.raf(time * 1000);
       if (lenis) {
         lenis.on("scroll", ScrollTrigger.update);
