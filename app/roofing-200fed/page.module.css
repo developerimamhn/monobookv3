@@ -1,0 +1,127 @@
+/* Styles for the roofing page only. Shared pieces (type, buttons, sections,
+   cards) come from the site's global classes; this file only lays them out. */
+
+.page {
+  background: var(--paper);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  min-height: var(--header-h);
+}
+
+.barButton {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .barButton {
+    display: inline-flex;
+    width: auto;
+    min-height: var(--tap);
+    padding-block: var(--space-2);
+    font-size: var(--text-small);
+  }
+}
+
+.hero {
+  padding-block: var(--space-9) var(--space-section);
+}
+
+.title {
+  font-size: var(--text-hero);
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+
+.sub {
+  margin-top: var(--space-7);
+  max-width: 40ch;
+  color: var(--ink);
+}
+
+.heroButton {
+  margin-top: var(--space-7);
+}
+
+.parts {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-9);
+}
+
+.part {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--paper);
+  border-radius: var(--radius);
+}
+
+.num {
+  font-size: var(--text-small);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 900px) {
+  .parts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .parts {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* On this White section the light cards need Stone to stand out; the Sprint card stays Black. */
+.paceCard:not(:global(.pace-option--sprint)) {
+  background: var(--stone);
+}
+
+.proofBody {
+  margin-top: var(--space-9);
+  row-gap: var(--space-8);
+}
+
+.quote {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.cite {
+  margin-top: var(--space-5);
+  color: var(--paper-muted);
+}
+
+.note {
+  margin-top: var(--space-7);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-block: var(--space-7);
+  font-size: var(--text-small);
+  color: var(--muted);
+}
+
+.tile {
+  flex: none;
+  width: 2.75rem;
+  border-radius: var(--radius-sm);
+}
