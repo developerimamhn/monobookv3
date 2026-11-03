@@ -25,17 +25,20 @@ export function Showcase() {
         <div className="showcase-grid">
           {showcase.images.map((image, i) => (
             <Reveal as="figure" key={image.name} className={`showcase-item showcase-item--${i + 1}`}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- static export, the WebP sizes are prebuilt */}
-              <img
-                src={`/brand/${image.name}-1400.webp`}
-                srcSet={srcSet(image.name)}
-                sizes={i === 0 ? SIZES.large : SIZES.small}
-                width={2400}
-                height={1600}
-                alt={image.alt}
-                loading="lazy"
-                decoding="async"
-              />
+              {/* The frame clips the photo, so it can settle from a slight zoom as it scrolls in. */}
+              <div className="showcase-media">
+                {/* eslint-disable-next-line @next/next/no-img-element -- static export, the WebP sizes are prebuilt */}
+                <img
+                  src={`/brand/${image.name}-1400.webp`}
+                  srcSet={srcSet(image.name)}
+                  sizes={i === 0 ? SIZES.large : SIZES.small}
+                  width={2400}
+                  height={1600}
+                  alt={image.alt}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
               <figcaption>{image.caption}</figcaption>
             </Reveal>
           ))}

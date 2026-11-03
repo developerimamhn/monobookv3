@@ -1,6 +1,6 @@
 /**
- * Every word on the site. docs/BRIEF.md is the source; `npm run check:brief`
- * enforces its hard rules. Placeholders are marked [LIKE THIS].
+ * Every word on the site. `npm run check:brief` enforces the hard rules
+ * (scripts/brief-check.mjs). Placeholders are marked [LIKE THIS].
  */
 
 export const site = {

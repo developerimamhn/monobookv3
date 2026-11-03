@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Checks the built site (out/) and the source against the hard rules in
- * docs/BRIEF.md. Run after `npm run build`. Exits 1 on any failure.
+ * Checks the built site (out/) and the source against the site's hard rules:
+ * no prices, invented numbers or other clients, the quote word for word, the
+ * brand palette and type. Run after `npm run build`. Exits 1 on any failure.
  */
 import { fileURLToPath } from "node:url";
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";

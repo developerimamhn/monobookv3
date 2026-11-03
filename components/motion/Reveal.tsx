@@ -36,6 +36,8 @@ export function Reveal({ children, as: Tag = "div", className, delay = 0, stagge
       ease: motion.ease,
       delay,
       stagger: stagger ? motion.stagger : 0,
+      // Leave no inline styles behind, so CSS (hover lifts, print) has the last word.
+      clearProps: "opacity,transform",
       scrollTrigger: { trigger: el, start: "top 85%", once: true },
     });
   });

@@ -740,8 +740,30 @@ p {
 }
 
 .hero-foot {
+  position: relative;
   padding-top: var(--space-5);
-  border-top: 1px solid var(--line-strong);
+}
+
+/* The rule above the sub line draws across once the headline is in. */
+.hero-foot::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: var(--line-strong);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-foot::before {
+    animation: hero-rule 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.25s both;
+  }
+}
+
+@keyframes hero-rule {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 .hero-sub {
@@ -786,13 +808,17 @@ p {
   gap: var(--space-4);
 }
 
-.showcase-item img {
+.showcase-media {
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--ink);
+}
+
+.showcase-media img {
   width: 100%;
   height: auto;
   aspect-ratio: 3 / 2;
   object-fit: cover;
-  border-radius: var(--radius);
-  background: var(--ink);
 }
 
 .showcase-item figcaption {
@@ -811,8 +837,11 @@ p {
     display: grid;
     grid-template-rows: 1fr auto;
   }
+  .showcase-item--1 .showcase-media,
   .showcase-item--1 img {
     height: 100%;
+  }
+  .showcase-item--1 img {
     aspect-ratio: auto;
   }
 }
@@ -1025,7 +1054,7 @@ p {
 
 .van {
   width: 100%;
-  max-width: 30rem;
+  max-width: 34rem;
 }
 
 .van-body,
@@ -1050,7 +1079,7 @@ p {
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
-  width: min(100%, 20rem);
+  width: min(100%, 22rem);
   aspect-ratio: 85 / 55;
   padding: var(--space-5);
   background: var(--paper);
@@ -1299,6 +1328,16 @@ p {
   padding: var(--space-6);
   background: var(--paper);
   border-radius: var(--radius);
+}
+
+/* A small lift under the pointer. Hover devices only, so a tap never leaves a card raised. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .pace-option {
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .pace-option:hover {
+    transform: translateY(-6px);
+  }
 }
 
 /* The sprint is the one-day option, so it gets the dark card. */
@@ -1558,7 +1597,7 @@ p {
 
 .proof-drawing {
   width: 100%;
-  max-width: 26rem;
+  max-width: 34rem;
   height: auto;
 }
 
@@ -1604,6 +1643,11 @@ p {
   .proof-quote blockquote p {
     text-indent: -0.4em;
   }
+}
+
+/* Once SplitText wraps each word in an inline block, the indent must not repeat inside every word. */
+.proof-quote blockquote p > div {
+  text-indent: 0;
 }
 
 .proof-quote figcaption {
