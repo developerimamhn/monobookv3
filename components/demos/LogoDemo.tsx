@@ -9,7 +9,7 @@ const wordmarkScale = WORDMARK_WIDTH / logo.wordmark.w;
 export function LogoDemo() {
   return (
     <figure className="demo demo-logo" role="img" aria-label={copy.figureLabel}>
-      <div aria-hidden="true">
+      <div aria-hidden="true" data-demo-step>
         <svg viewBox="0 0 320 160" className="van">
           <path className="van-body" d="M12 118V40a8 8 0 0 1 8-8h180a8 8 0 0 1 8 8v20h44c4 0 7 2 9 5l35 38c2 2 3 5 3 8v7a6 6 0 0 1-6 6H12z" />
           <path className="van-line" d="M208 60v58M232 60v34h66" />
@@ -19,7 +19,7 @@ export function LogoDemo() {
         </svg>
         <p className="demo-caption">{copy.van}</p>
       </div>
-      <div aria-hidden="true">
+      <div aria-hidden="true" data-demo-step>
         <div className="card">
           <LogoTile className="card-mark" data-stamp="" />
           <div className="card-text">

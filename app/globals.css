@@ -388,10 +388,17 @@ p {
   }
 }
 
+/* Heading line masks (SiteMotion.tsx): room below the baseline for g, y and commas. */
+.split-line-mask {
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+}
+
 /* A block still waiting to reveal shows at once when it takes keyboard focus. */
 [data-reveal]:focus-within,
 [data-reveal]:focus-within > *,
-[data-pin-part]:focus-within {
+[data-pin-part]:focus-within,
+.deliverable-inner:focus-within {
   opacity: 1 !important;
   transform: none !important;
 }
@@ -1516,10 +1523,19 @@ p {
 }
 
 .proof-images {
+  margin-top: var(--space-9);
+}
+
+.proof-frames {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
-  margin-top: var(--space-9);
+}
+
+@media (min-width: 900px) {
+  .proof-frames {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .proof-frame {
@@ -1529,9 +1545,8 @@ p {
   aspect-ratio: 4 / 3;
   border: 1px solid var(--line-dark);
   border-radius: var(--radius);
-  background: var(--paper-faint);
-  padding: var(--space-5);
-  text-align: center;
+  background: var(--ink);
+  padding: var(--space-8) var(--space-5) var(--space-5);
 }
 
 .proof-frame-label {
@@ -1541,15 +1556,30 @@ p {
   font-size: var(--text-small);
 }
 
-.proof-frame-placeholder {
-  font-size: var(--text-small);
-  color: var(--paper-muted);
+.proof-drawing {
+  width: 100%;
+  max-width: 26rem;
+  height: auto;
 }
 
-@media (min-width: 900px) {
-  .proof-images {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.drawing-panel {
+  fill: var(--paper-faint);
+  stroke: var(--line-dark);
+}
+
+.drawing-mark {
+  fill: var(--paper);
+}
+
+.drawing-bar,
+.drawing-mark--faint {
+  fill: var(--paper-muted);
+}
+
+.proof-note {
+  margin-top: var(--space-4);
+  font-size: var(--text-small);
+  color: var(--paper-muted);
 }
 
 .proof-quote {
@@ -1775,15 +1805,15 @@ p {
   height: auto;
 }
 
-/* --- Not found ------------------------------------------------------------ */
+/* --- Plain pages: 404 and privacy ----------------------------------------- */
 
-.not-found {
+.plain-page {
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
 }
 
-.not-found-inner {
+.plain-page-inner {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1791,12 +1821,30 @@ p {
   padding-block: var(--space-6) var(--space-9);
 }
 
-.not-found-body {
+.plain-page-body {
   margin-top: var(--space-5);
 }
 
-.not-found-link {
+.plain-page-link {
   margin-top: var(--space-7);
+}
+
+.legal {
+  max-width: 44rem;
+}
+
+.legal section {
+  margin-top: var(--space-8);
+}
+
+.legal h2 {
+  font-size: var(--text-h3);
+}
+
+.legal section p {
+  margin-top: var(--space-4);
+  color: var(--muted);
+  max-width: 60ch;
 }
 
 /* --- Windows High Contrast ------------------------------------------------ */
@@ -1835,13 +1883,17 @@ p {
   [style*="opacity"],
   [style*="transform"],
   [data-reveal],
-  [data-pin-part] {
+  [data-pin-part],
+  [data-demo-step] {
     opacity: 1 !important;
     transform: none !important;
   }
+  [style*="clip-path"] {
+    clip-path: none !important;
+  }
   .hero,
   .deliverable,
-  .not-found {
+  .plain-page {
     min-height: auto;
   }
   .section--ink,
@@ -1855,7 +1907,7 @@ p {
   .section--ink .lead,
   .proof-facts dt,
   .proof-did-label,
-  .proof-frame-placeholder,
+  .proof-note,
   .proof-quote figcaption,
   .pace-option--sprint .body,
   .pace-option--sprint .pace-length,
@@ -1872,5 +1924,17 @@ p {
   .proof-facts div,
   .proof-frame {
     border-color: var(--line-strong);
+    background: none;
+  }
+  .drawing-mark {
+    fill: var(--ink);
+  }
+  .drawing-bar,
+  .drawing-mark--faint {
+    fill: var(--muted);
+  }
+  .drawing-panel {
+    fill: none;
+    stroke: var(--line-strong);
   }
 }

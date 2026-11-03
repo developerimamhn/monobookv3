@@ -1,3 +1,4 @@
+import { SiteMotion } from "@/components/motion/SiteMotion";
 import { Contact } from "@/components/sections/Contact";
 import { Deliverables } from "@/components/sections/Deliverables";
 import { Footer } from "@/components/sections/Footer";
@@ -26,6 +27,7 @@ export default function Home() {
       </main>
       <Footer />
       <MobileCta />
+      <SiteMotion />
     </>
   );
 }

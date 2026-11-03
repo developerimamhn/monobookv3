@@ -50,6 +50,17 @@ export function loadMotion(): Promise<MotionLib> {
   return lib;
 }
 
+let split: Promise<typeof import("gsap/SplitText").SplitText> | null = null;
+
+/** SplitText, for the masked heading reveals. Loaded only when motion is on. */
+export function loadSplitText() {
+  split ??= Promise.all([loadMotion(), import("gsap/SplitText")]).then(([{ gsap }, m]) => {
+    gsap.registerPlugin(m.SplitText);
+    return m.SplitText;
+  });
+  return split;
+}
+
 export function loadLenis() {
   return import("lenis").then((m) => m.default);
 }

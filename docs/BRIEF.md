@@ -36,8 +36,8 @@ Quote (word for word):
 "Mehedi was hired to do a visual rebrand for our 40+ year organization. He was an excellent communicator, showed exceptional passion for the project, and delivered a finished product exactly what we were hoping for."
 - Eric Dahl, Client, December 2023
 Mehedi Hasan is the owner of MonoBook and led the Mayfair rebrand.
-Mayfair before and after images: placeholders for now.
-Proof intro: "In every one of these the company was already good at what it does. What changed was whether that was visible in the seconds a customer gives it. We do not take credit for their revenue. They built that."
+Mayfair before and after images: placeholders for now. Until they arrive the frames hold a drawing of the idea, labelled as an illustration.
+Proof intro (owner decision, November 2026: it names Mayfair now that it is the only case): "Mayfair was already good at what it does. What changed was whether that was visible in the seconds a customer gives it. We do not take credit for their revenue. They built that."
 
 ### Page order
 1. Hero: the main line, one short sub line, nothing else on screen. Below it, a band of MonoBook's own brand mockups.

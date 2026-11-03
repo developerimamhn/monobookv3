@@ -8,7 +8,7 @@ export function ImageDemo() {
       <div className="photo-grid" aria-hidden="true">
         {copy.photos.map((name) => (
           // eslint-disable-next-line @next/next/no-img-element -- static export, the WebP sizes are prebuilt
-          <img key={name} className="photo-frame" src={`/brand/${name}-800.webp`} width={800} height={533} alt="" loading="lazy" decoding="async" />
+          <img key={name} className="photo-frame" data-demo-step src={`/brand/${name}-800.webp`} width={800} height={533} alt="" loading="lazy" decoding="async" />
         ))}
       </div>
       <ul className="photo-rules" aria-hidden="true">

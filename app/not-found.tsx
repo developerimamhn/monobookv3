@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main id="main" className="not-found">
-      <div className="container not-found-inner">
+    <main id="main" className="plain-page">
+      <div className="container plain-page-inner">
         <Link href="/" className="wordmark" aria-label={site.name}>
           <Wordmark className="wordmark-svg" />
         </Link>
         <div>
           <h1 className="h2">{notFound.title}</h1>
-          <p className="lead not-found-body">{notFound.body}</p>
-          <Link href="/" className="button not-found-link">
+          <p className="lead plain-page-body">{notFound.body}</p>
+          <Link href="/" className="button plain-page-link">
             {notFound.link}
           </Link>
         </div>

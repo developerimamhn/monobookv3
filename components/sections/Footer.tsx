@@ -42,6 +42,10 @@ export function Footer() {
             <ScrollLink href="#top" className="footer-link">
               {footer.backToTop}
             </ScrollLink>
+            {/* A plain link: Next's static export does not write the data file a <Link> prefetches for this route. */}
+            <a href="/privacy/" className="footer-link">
+              {footer.privacy}
+            </a>
           </div>
         </div>
         <div className="footer-brand">

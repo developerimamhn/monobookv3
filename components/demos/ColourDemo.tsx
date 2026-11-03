@@ -7,7 +7,7 @@ export function ColourDemo() {
     <figure className="demo" role="img" aria-label={copy.figureLabel}>
       <ul className="swatches" aria-hidden="true">
         {copy.swatches.map((swatch) => (
-          <li key={swatch.name} className="swatch">
+          <li key={swatch.name} className="swatch" data-demo-step>
             <span className={`swatch-chip swatch--${swatch.tone}`} />
             <span className="swatch-name">{swatch.name}</span>
             <span className="swatch-row">

@@ -53,6 +53,8 @@ The browser checks drive your installed Chrome through puppeteer-core. Set `CHRO
 - **Problem:** the sentence darkens word by word; two mismatched marks slide together and resolve into the Mk. tile.
 - **Deliverables:** on screens at least 900px wide and 760px tall, each one pins briefly and the Mk. tile lands on its demo. Elsewhere the parts reveal once.
 - **Sprint day:** the timeline draws itself and each step's dot lands in turn.
+- **Headings** rise line by line from behind a mask (GSAP SplitText), then return to plain text.
+- **Contact** opens out from a rounded inset; the Mayfair "After" frame wipes in; the footer wordmark rises and the Mk. tile lands last.
 - **Reveals** animate opacity only, never visibility, so content waiting to appear stays in the tab order, in find-in-page and in print.
 - **Scroll keeper** (`components/motion/scrollKeeper.ts`): pins add height after the browser has scrolled, so it puts deep links, reloads and resizes back on the right block.
 - **Reduced motion:** Lenis is never created and every GSAP effect is skipped, including when the setting changes while the page is open.
@@ -61,5 +63,6 @@ The browser checks drive your installed Chrome through puppeteer-core. Set `CHRO
 
 | Item | Where |
 |---|---|
-| Mayfair before and after images, `[MAYFAIR BEFORE IMAGE]` and `[MAYFAIR AFTER IMAGE]` | `proof.images` in `content/copy.ts`, frames in `components/sections/Proof.tsx` |
+| Mayfair before and after images. The frames hold a labelled illustration until then | `components/sections/Proof.tsx` (BeforeDrawing, AfterDrawing) and `proof.images` in `content/copy.ts` |
+| Confirm the privacy notice matches how you handle email | `privacy` in `content/copy.ts` |
 | Lines written from the brief rather than quoted from it: `hero.sub`, `pace.heading`, `pace.intro`, `pace.options[].body`, `needs.heading`, `needs.note`, `demos.image.rules`, `footer.hours` | `content/copy.ts` |

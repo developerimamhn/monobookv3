@@ -230,8 +230,9 @@ export const needs = {
 export const proof = {
   index: "05",
   label: "Proof",
+  // The brief's line said "In every one of these"; with one case on the page it now names it.
   intro:
-    "In every one of these the company was already good at what it does. What changed was whether that was visible in the seconds a customer gives it. We do not take credit for their revenue. They built that.",
+    "Mayfair was already good at what it does. What changed was whether that was visible in the seconds a customer gives it. We do not take credit for their revenue. They built that.",
   card: {
     company: "Mayfair Lumber Sales Ltd",
     facts: [
@@ -243,10 +244,12 @@ export const proof = {
     didLabel: "What we did",
     did: "A full visual rebrand of a company that had been trading for four decades: mark, colour, type and an applied identity system across print, signage and digital.",
   },
+  // Until the real Mayfair images arrive, the frames hold a drawing of the idea, labelled as one.
   images: {
-    before: { label: "Before", placeholder: "[MAYFAIR BEFORE IMAGE]" },
-    after: { label: "After", placeholder: "[MAYFAIR AFTER IMAGE]" },
-    figureLabel: "Mayfair Lumber identity before and after the rebrand. Images to follow.",
+    before: "Before",
+    after: "After",
+    note: "Illustration. The Mayfair before and after images will replace it.",
+    figureLabel: "An illustration of the change: three mismatched marks before, one consistent mark after. The Mayfair images will replace it.",
   },
   /** Word for word from the client. Do not edit, not even the spelling. */
   quote:
@@ -281,6 +284,44 @@ export const footer = {
   contactLabel: "Contact",
   pagesLabel: "On this page",
   backToTop: "Back to top",
+  privacy: "Privacy",
+} as const;
+
+/** Plain-English privacy notice for UK visitors. The site sets no cookies and runs no analytics. */
+export const privacy = {
+  title: "Privacy",
+  intro: "This site does not track you. Here is what happens to what you send us.",
+  sections: [
+    {
+      heading: "Who we are",
+      body: [
+        `${site.name} is run by ${site.owner}. For anything about your data, email ${site.email}.`,
+      ],
+    },
+    {
+      heading: "What this site collects",
+      body: [
+        "Nothing. There are no cookies, no analytics and no tracking. Fonts and images load from this site, not from other companies.",
+        "Like any website, the company that hosts it may keep short technical logs, such as an IP address and the page asked for, to keep the service running and secure.",
+      ],
+    },
+    {
+      heading: "When you email us",
+      body: [
+        "We receive your email address and whatever you send: your brief, logo files and photos.",
+        "We use it to reply to you and, if you go ahead, to do the work. We keep it only as long as we need it for that, then delete it.",
+        "We do not sell it or pass it on. The only other company that holds it is our email provider, which stores our mail.",
+      ],
+    },
+    {
+      heading: "Your rights",
+      body: [
+        "Under UK data protection law you can ask to see what we hold about you, have it corrected or deleted, or object to how we use it. Email us and we will do it.",
+        "If you are not happy with how we handle your data, you can complain to the Information Commissioner's Office at ico.org.uk.",
+      ],
+    },
+  ],
+  back: "Back to the home page",
 } as const;
 
 export const notFound = {
